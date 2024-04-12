@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Online_Library.Interfaces;
 using Online_Library.Models;
-using Online_Library.Repositories;
 
 namespace Online_Library.Controllers
 {
@@ -69,12 +68,12 @@ namespace Online_Library.Controllers
         public IActionResult Accept(int id)
         {
             var user = _repo.GetById(id);
-            if (user ==null)
+            if (user == null)
             {
                 return NotFound(user);
             }
             _repo.Accept(user);
-            
+
             return NoContent();
 
 
@@ -82,7 +81,7 @@ namespace Online_Library.Controllers
 
         [HttpPut("Promote/{id}")]
 
-        public IActionResult MakeLibrarian(int id) 
+        public IActionResult MakeLibrarian(int id)
         {
             var user = _repo.GetById(id);
             if (user == null)

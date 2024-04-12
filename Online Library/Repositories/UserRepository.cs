@@ -31,15 +31,16 @@ namespace Online_Library.Repositories
             bool? status = existingUser.IsAccepted;
             if (_context.Users.Any(u => u.UserName == userName || u.Email == email))
             {
-                if(status == false)
+                if (status == false)
                 {
                     throw new ArgumentException("This user was already rejected," +
                                                  "Call the librarian for more info");
-                } else
+                }
+                else
                     throw new ArgumentException("Username or email already exists.");
             }
             bool anyUsers = _context.Users.Any();
-            if (!anyUsers) 
+            if (!anyUsers)
             {
                 user.IsAccepted = true;
                 user.IsAdmin = true;
@@ -50,7 +51,7 @@ namespace Online_Library.Repositories
 
         public void Reject(User user)
         {
-            
+
             if (user != null)
             {
                 user.IsAccepted = false;
@@ -64,7 +65,7 @@ namespace Online_Library.Repositories
         }
         public IEnumerable<User> GetAcceptedUsers()
         {
-            return _context.Users.Where(u => u.IsAccepted == true).OrderBy(e=>e.Id).ToList();
+            return _context.Users.Where(u => u.IsAccepted == true).OrderBy(e => e.Id).ToList();
         }
 
         public User GetById(int Id)
