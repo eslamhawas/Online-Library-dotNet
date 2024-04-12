@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Online_Library.Interfaces;
 using Online_Library.Models;
 using Online_Library.Repositories;
@@ -38,7 +39,7 @@ namespace Online_Library.Controllers
             return Ok(user);
         }
 
-        [HttpPost]
+        [HttpPost("AddUser/")]
 
         public IActionResult Add(User user)
         {
@@ -50,6 +51,35 @@ namespace Online_Library.Controllers
             }
             _repo.Add(user);
             return CreatedAtAction(nameof(Add), new { id = user.Id }, user);
+        }
+
+        [HttpPut("Accept/{id}")]
+
+        public IActionResult Accept(int id)
+        {
+            var user = _repo.GetById(id);
+            if (user ==null)
+            {
+                return BadRequest(user);
+            }
+            _repo.accept(user);
+            
+            return NoContent();
+
+
+        }
+
+        [HttpPut("Promote/{id}")]
+
+        public IActionResult MakeLibrarian(int id) 
+        {
+            var user = _repo.GetById(id);
+            if (user == null)
+            {
+                return BadRequest(user);
+            }
+            _repo.MakeLibrarian(user);
+            return Ok(user);
         }
     }
 }

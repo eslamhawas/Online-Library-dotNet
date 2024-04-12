@@ -12,8 +12,25 @@ namespace Online_Library.Repositories
         {
             _context = context;
         }
+
+        public void accept(User user)
+        {
+            if (user != null)
+            {
+                user.IsAccepted = true;
+                _context.Users.Update(user);
+                _context.SaveChanges();
+            }
+        }
+
         public void Add(User user)
         {
+            bool anyUsers = _context.Users.Any();
+            if (!anyUsers) 
+            {
+                user.IsAccepted = true;
+                user.IsAdmin = true;
+            }
             _context.Users.Add(user);
             _context.SaveChanges();
         }
@@ -37,6 +54,16 @@ namespace Online_Library.Repositories
         {
             var user = _context.Users.Where(e => e.Id == Id).FirstOrDefault();
             return user;
+        }
+
+        public void MakeLibrarian(User user)
+        {
+            if (user != null)
+            {
+                user.IsAdmin = true;
+                _context.Users.Update(user);
+                _context.SaveChanges();
+            }
         }
     }
 }

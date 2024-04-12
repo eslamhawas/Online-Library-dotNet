@@ -11,6 +11,10 @@ namespace Online_Library.Interfaces
 
         User GetById(int Id);
 
+        void accept(User user);
+
+        void MakeLibrarian(User user);
+
 
 
 
