@@ -17,10 +17,21 @@ namespace Online_Library.Controllers
             _repo = repo;
         }
 
-        [HttpGet]
-        public IActionResult GetAll()
+        [HttpGet("Accepted")]
+        public IActionResult GetAllAcceptedUsers()
         {
-            var users = _repo.GetAll();
+            var users = _repo.GetAcceptedUsers();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            return Ok(users);
+        }
+
+        [HttpGet("Pending")]
+        public IActionResult GetPendingUsers()
+        {
+            var users = _repo.GetPendingUsers();
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -29,7 +40,7 @@ namespace Online_Library.Controllers
         }
 
         [HttpGet("{id}")]
-        public IActionResult Get(int id)
+        public IActionResult GetById(int id)
         {
             var user = _repo.GetById(id);
             if (user == null)
@@ -39,9 +50,9 @@ namespace Online_Library.Controllers
             return Ok(user);
         }
 
-        [HttpPost("AddUser/")]
+        [HttpPost("AddUser")]
 
-        public IActionResult Add(User user)
+        public IActionResult AddUser(User user)
         {
 
             ModelState.Remove("user.Id");
@@ -50,7 +61,7 @@ namespace Online_Library.Controllers
                 return BadRequest(ModelState);
             }
             _repo.Add(user);
-            return CreatedAtAction(nameof(Add), new { id = user.Id }, user);
+            return CreatedAtAction(nameof(AddUser), new { id = user.Id }, user);
         }
 
         [HttpPut("Accept/{id}")]
@@ -62,7 +73,7 @@ namespace Online_Library.Controllers
             {
                 return NotFound(user);
             }
-            _repo.accept(user);
+            _repo.Accept(user);
             
             return NoContent();
 
@@ -82,16 +93,16 @@ namespace Online_Library.Controllers
             return Ok(user);
         }
 
-        [HttpDelete("Delete/{id}")]
+        [HttpPut("Reject/{id}")]
 
-        public IActionResult Delete(int id)
+        public IActionResult Reject(int id)
         {
             var user = _repo.GetById(id);
             if (user == null)
             {
                 return NotFound(user);
             }
-            _repo.Delete(user);
+            _repo.Reject(user);
 
             return NoContent();
         }

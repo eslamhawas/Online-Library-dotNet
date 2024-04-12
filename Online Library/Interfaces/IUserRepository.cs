@@ -4,14 +4,16 @@ namespace Online_Library.Interfaces
 {
     public interface IUserRepository
     {
-        IEnumerable<User> GetAll();
+        IEnumerable<User> GetAcceptedUsers();
+        IEnumerable<User> GetPendingUsers();
+
         void Add(User user);
 
-        void Delete(User user);
+        void Reject(User user);
 
         User GetById(int Id);
 
-        void accept(User user);
+        void Accept(User user);
 
         void MakeLibrarian(User user);
 

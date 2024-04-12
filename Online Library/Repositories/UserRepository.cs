@@ -13,7 +13,7 @@ namespace Online_Library.Repositories
             _context = context;
         }
 
-        public void accept(User user)
+        public void Accept(User user)
         {
             if (user != null)
             {
@@ -25,6 +25,19 @@ namespace Online_Library.Repositories
 
         public void Add(User user)
         {
+            string userName = user.UserName;
+            string email = user.Email;
+            var existingUser = _context.Users.Where(e => e.UserName == userName).FirstOrDefault();
+            bool? status = existingUser.IsAccepted;
+            if (_context.Users.Any(u => u.UserName == userName || u.Email == email))
+            {
+                if(status == false)
+                {
+                    throw new ArgumentException("This user was already rejected," +
+                                                 "Call the librarian for more info");
+                } else
+                    throw new ArgumentException("Username or email already exists.");
+            }
             bool anyUsers = _context.Users.Any();
             if (!anyUsers) 
             {
@@ -35,19 +48,23 @@ namespace Online_Library.Repositories
             _context.SaveChanges();
         }
 
-        public void Delete(User user)
+        public void Reject(User user)
         {
             
             if (user != null)
             {
-                _context.Users.Remove(user);
+                user.IsAccepted = false;
+                _context.Users.Update(user);
                 _context.SaveChanges();
             }
         }
-
-        public IEnumerable<User> GetAll()
+        public IEnumerable<User> GetPendingUsers()
         {
-            return _context.Users.OrderBy(e=>e.Id).ToList();
+            return _context.Users.Where(u => u.IsAccepted == null).OrderBy(e => e.Id).ToList();
+        }
+        public IEnumerable<User> GetAcceptedUsers()
+        {
+            return _context.Users.Where(u => u.IsAccepted == true).OrderBy(e=>e.Id).ToList();
         }
 
         public User GetById(int Id)
