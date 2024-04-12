@@ -60,7 +60,7 @@ namespace Online_Library.Controllers
             var user = _repo.GetById(id);
             if (user ==null)
             {
-                return BadRequest(user);
+                return NotFound(user);
             }
             _repo.accept(user);
             
@@ -76,10 +76,25 @@ namespace Online_Library.Controllers
             var user = _repo.GetById(id);
             if (user == null)
             {
-                return BadRequest(user);
+                return NotFound(user);
             }
             _repo.MakeLibrarian(user);
             return Ok(user);
         }
+
+        [HttpDelete("Delete/{id}")]
+
+        public IActionResult Delete(int id)
+        {
+            var user = _repo.GetById(id);
+            if (user == null)
+            {
+                return NotFound(user);
+            }
+            _repo.Delete(user);
+
+            return NoContent();
+        }
+
     }
 }

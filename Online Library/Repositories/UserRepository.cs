@@ -35,9 +35,9 @@ namespace Online_Library.Repositories
             _context.SaveChanges();
         }
 
-        public void Delete(int Id)
+        public void Delete(User user)
         {
-            var user = _context.Users.Where(u => u.Id == Id).FirstOrDefault();
+            
             if (user != null)
             {
                 _context.Users.Remove(user);

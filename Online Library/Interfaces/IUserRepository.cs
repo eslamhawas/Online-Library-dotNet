@@ -7,7 +7,7 @@ namespace Online_Library.Interfaces
         IEnumerable<User> GetAll();
         void Add(User user);
 
-        void Delete(int Id);
+        void Delete(User user);
 
         User GetById(int Id);
 
