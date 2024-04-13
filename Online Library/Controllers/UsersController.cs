@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
 using Online_Library.Interfaces;
 using Online_Library.Models;
 
@@ -49,9 +47,9 @@ namespace Online_Library.Controllers
             return Ok(user);
         }
 
-        [HttpPost("AddUser")]
+        [HttpPost("Register")]
 
-        public IActionResult AddUser(User user)
+        public IActionResult Register(User user)
         {
 
             ModelState.Remove("user.Id");
@@ -59,8 +57,8 @@ namespace Online_Library.Controllers
             {
                 return BadRequest(ModelState);
             }
-            _repo.Add(user);
-            return CreatedAtAction(nameof(AddUser), new { id = user.Id }, user);
+            _repo.Register(user);
+            return CreatedAtAction(nameof(Register), new { id = user.Id }, user);
         }
 
         [HttpPut("Accept/{id}")]

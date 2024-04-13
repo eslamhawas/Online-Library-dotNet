@@ -7,7 +7,7 @@ namespace Online_Library.Interfaces
         IEnumerable<User> GetAcceptedUsers();
         IEnumerable<User> GetPendingUsers();
 
-        void Add(User user);
+        void Register(User user);
 
         void Reject(User user);
 

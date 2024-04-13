@@ -23,8 +23,9 @@ namespace Online_Library.Repositories
             }
         }
 
-        public void Add(User user)
+        public void Register(User user)
         {
+            //Checks if the if user already exists
             string userName = user.UserName;
             string email = user.Email;
             var existingUser = _context.Users.Where(e => e.UserName == userName).FirstOrDefault();
@@ -39,6 +40,7 @@ namespace Online_Library.Repositories
                 else
                     throw new ArgumentException("Username or email already exists.");
             }
+            // auto accept new user and make them admin if there is no users in DB
             bool anyUsers = _context.Users.Any();
             if (!anyUsers)
             {
