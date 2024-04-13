@@ -25,7 +25,6 @@ namespace Online_Library.Data
         {
             if (!optionsBuilder.IsConfigured)
             {
-             
             }
         }
 
@@ -34,7 +33,7 @@ namespace Online_Library.Data
             modelBuilder.Entity<Book>(entity =>
             {
                 entity.HasKey(e => e.Isbn)
-                    .HasName("PK__Books__447D36EBE3BF492C");
+                    .HasName("PK__Books__447D36EB41D29538");
 
                 entity.Property(e => e.Isbn)
                     .HasMaxLength(50)
@@ -70,12 +69,12 @@ namespace Online_Library.Data
                 entity.HasOne(d => d.BookIsbnNavigation)
                     .WithMany()
                     .HasForeignKey(d => d.BookIsbn)
-                    .HasConstraintName("FK__BorrowedB__BookI__29572725");
+                    .HasConstraintName("FK__BorrowedB__BookI__45F365D3");
 
                 entity.HasOne(d => d.User)
                     .WithMany()
                     .HasForeignKey(d => d.UserId)
-                    .HasConstraintName("FK__BorrowedB__UserI__2A4B4B5E");
+                    .HasConstraintName("FK__BorrowedB__UserI__46E78A0C");
             });
 
             modelBuilder.Entity<User>(entity =>
@@ -85,12 +84,12 @@ namespace Online_Library.Data
                 entity.Property(e => e.DateOfBirth).HasColumnType("date");
 
                 entity.Property(e => e.Email)
-                    .HasMaxLength(50)
+                    .HasMaxLength(150)
                     .IsUnicode(false);
 
-                entity.Property(e => e.Password)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
+                entity.Property(e => e.PassordSalt).HasMaxLength(1000);
+
+                entity.Property(e => e.PasswordHash).HasMaxLength(1000);
 
                 entity.Property(e => e.UserName)
                     .HasMaxLength(50)
