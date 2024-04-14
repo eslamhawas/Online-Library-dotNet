@@ -18,6 +18,8 @@ namespace Online_Library.Interfaces
 
         void MakeLibrarian(User user);
 
+        string Login(UserlLoginDto user);
+
 
 
 

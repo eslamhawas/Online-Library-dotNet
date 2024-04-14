@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Online_Library.Data;
 using Online_Library.DTOS;
 using Online_Library.Interfaces;
 using Online_Library.Models;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Security.Cryptography;
 
 namespace Online_Library.Repositories
@@ -12,11 +15,13 @@ namespace Online_Library.Repositories
     {
         private readonly OnlineLibraryContext _context;
         private readonly IMapper _mapper;
-        public UserRepository(OnlineLibraryContext context,IMapper mapper
-            )
+        private readonly IConfiguration _configuration;
+
+        public UserRepository(OnlineLibraryContext context,IMapper mapper, IConfiguration configuration )
         {
             _context = context;
             _mapper = mapper;
+            _configuration = configuration;
         }
 
         public void Accept(User user)
@@ -81,16 +86,6 @@ namespace Online_Library.Repositories
                 _context.SaveChanges();
             }
         }
-
-        private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
-        {
-            using (var hmac = new HMACSHA512())
-            {
-                passwordSalt = hmac.Key;
-                passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-            }
-        }
-
         private void CheckForExistingUsers(UserRegisterDto user)
         {
             string userName = user.UserName;
@@ -109,7 +104,57 @@ namespace Online_Library.Repositories
                     throw new ArgumentException("Username or email already exists.");
             }
         }
+        public string Login(UserlLoginDto user)
+        {
+            string email = user.Email;
+            var existingUser =_context.Users.Where(u => u.Email == email).FirstOrDefault();
+            if (existingUser == null || !VerifyPasswordHash(user.Password,existingUser.PasswordHash,existingUser.PassordSalt))
+            {
+                throw new ArgumentException("There Is no User With this credntials");
+            }
+            string token = CreateToken(existingUser);
+            return(token);
+        }
 
+        private string CreateToken(User user)
+        {
+            List<Claim> claims = new List<Claim> 
+            {
+                new Claim(ClaimTypes.Name, user.UserName)
+            };
+
+            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
+                _configuration.GetSection("AppSettings:Token").Value));
+
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+
+            var token = new JwtSecurityToken(
+                claims : claims,
+                expires: DateTime.Now.AddDays(1),
+                signingCredentials : creds);
+
+            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+
+            return jwt;
+        }
+
+        private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
+        {
+            using (var hmac = new HMACSHA512())
+            {
+                passwordSalt = hmac.Key;
+                passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+            }
+        }
+
+        private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt ) 
+        {
+            using  (var hmac = new HMACSHA512(passwordSalt))
+            {
+                var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+                return computedHash.SequenceEqual(passwordHash);
+            }
+        }
 
     }
 }

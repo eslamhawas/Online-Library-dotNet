@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Online_Library.DTOS;
 using Online_Library.Interfaces;
-using Online_Library.Models;
 
 namespace Online_Library.Controllers
 {
@@ -59,6 +58,14 @@ namespace Online_Library.Controllers
             }
             _repo.Register(user);
             return CreatedAtAction(nameof(Register), new { user.Email }, user);
+        }
+
+        [HttpPost("Login")]
+
+        public IActionResult Login(UserlLoginDto user)
+        {
+            var token = _repo.Login(user);
+            return Ok(token);
         }
 
         [HttpPut("Accept/{id}")]
