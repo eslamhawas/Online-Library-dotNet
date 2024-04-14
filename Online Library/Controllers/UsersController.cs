@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Online_Library.DTOS;
 using Online_Library.Interfaces;
 using Online_Library.Models;
 
@@ -49,16 +50,15 @@ namespace Online_Library.Controllers
 
         [HttpPost("Register")]
 
-        public IActionResult Register(User user)
+        public IActionResult Register(UserRegisterDto user)
         {
 
-            ModelState.Remove("user.Id");
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
             _repo.Register(user);
-            return CreatedAtAction(nameof(Register), new { id = user.Id }, user);
+            return CreatedAtAction(nameof(Register), new { user.Email }, user);
         }
 
         [HttpPut("Accept/{id}")]

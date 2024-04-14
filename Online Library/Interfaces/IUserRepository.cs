@@ -1,4 +1,5 @@
-﻿using Online_Library.Models;
+﻿using Online_Library.DTOS;
+using Online_Library.Models;
 
 namespace Online_Library.Interfaces
 {
@@ -7,7 +8,7 @@ namespace Online_Library.Interfaces
         IEnumerable<User> GetAcceptedUsers();
         IEnumerable<User> GetPendingUsers();
 
-        void Register(User user);
+        void Register(UserRegisterDto user);
 
         void Reject(User user);
 
@@ -16,6 +17,8 @@ namespace Online_Library.Interfaces
         void Accept(User user);
 
         void MakeLibrarian(User user);
+
+
 
 
 

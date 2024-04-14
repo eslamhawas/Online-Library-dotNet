@@ -1,16 +1,22 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Online_Library.Data;
+using Online_Library.DTOS;
 using Online_Library.Interfaces;
 using Online_Library.Models;
+using System.Security.Cryptography;
 
 namespace Online_Library.Repositories
 {
     public class UserRepository : IUserRepository
     {
         private readonly OnlineLibraryContext _context;
-        public UserRepository(OnlineLibraryContext context)
+        private readonly IMapper _mapper;
+        public UserRepository(OnlineLibraryContext context,IMapper mapper
+            )
         {
             _context = context;
+            _mapper = mapper;
         }
 
         public void Accept(User user)
@@ -23,23 +29,13 @@ namespace Online_Library.Repositories
             }
         }
 
-        public void Register(User user)
+        public void Register(UserRegisterDto userDto)
         {
-            //Checks if the if user already exists
-            string userName = user.UserName;
-            string email = user.Email;
-            var existingUser = _context.Users.Where(e => e.UserName == userName).FirstOrDefault();
-            bool? status = existingUser.IsAccepted;
-            if (_context.Users.Any(u => u.UserName == userName || u.Email == email))
-            {
-                if (status == false)
-                {
-                    throw new ArgumentException("This user was already rejected," +
-                                                 "Call the librarian for more info");
-                }
-                else
-                    throw new ArgumentException("Username or email already exists.");
-            }
+            CheckForExistingUsers(userDto);
+            var user = _mapper.Map<User>(userDto);
+            CreatePasswordHash(userDto.Password, out byte[] passwordHash, out byte[] passwordSalt);
+            user.PasswordHash= passwordHash;
+            user.PassordSalt= passwordSalt;
             // auto accept new user and make them admin if there is no users in DB
             bool anyUsers = _context.Users.Any();
             if (!anyUsers)
@@ -85,5 +81,35 @@ namespace Online_Library.Repositories
                 _context.SaveChanges();
             }
         }
+
+        private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
+        {
+            using (var hmac = new HMACSHA512())
+            {
+                passwordSalt = hmac.Key;
+                passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+            }
+        }
+
+        private void CheckForExistingUsers(UserRegisterDto user)
+        {
+            string userName = user.UserName;
+            string email = user.Email;
+            var existingUser = _context.Users.Where(e => e.UserName == userName).FirstOrDefault();
+
+            if (_context.Users.Any(u => u.UserName == userName || u.Email == email))
+            {
+                bool? status = existingUser.IsAccepted;
+                if (status == false)
+                {
+                    throw new ArgumentException("This user was already rejected," +
+                                                 "Call the librarian for more info");
+                }
+                else
+                    throw new ArgumentException("Username or email already exists.");
+            }
+        }
+
+
     }
 }
