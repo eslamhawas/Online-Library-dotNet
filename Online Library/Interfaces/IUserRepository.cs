@@ -22,6 +22,11 @@ namespace Online_Library.Interfaces
 
         IEnumerable<User> GetUsers();
 
+        string GenerateBooksReport();
+
+        string GenerateBorrowedBooksReport();
+
+
 
 
 

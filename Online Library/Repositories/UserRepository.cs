@@ -172,5 +172,15 @@ namespace Online_Library.Repositories
             var existingUser = _context.Users.Where(u => u.Email == email).FirstOrDefault();
             return existingUser;
         }
+
+        public string GenerateBooksReport()
+        {
+            throw new NotImplementedException();
+        }
+
+        public string GenerateBorrowedBooksReport()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

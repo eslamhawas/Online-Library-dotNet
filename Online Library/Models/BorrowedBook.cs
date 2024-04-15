@@ -11,7 +11,7 @@ namespace Online_Library.Models
         public DateTime? DateOfReturn { get; set; }
         public int? OrderNumber { get; set; }
 
-        [DefaultValue(false)]
+        [DefaultValue(null)]
         public bool? IsAccepted { get; set; }
         [Required]
         public string? BookIsbn { get; set; }
