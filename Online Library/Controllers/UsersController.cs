@@ -53,7 +53,7 @@ namespace Online_Library.Controllers
             var user = _repo.GetById(id);
             if (user == null)
             {
-                return NotFound(user);
+                return NotFound("No User With this Id");
             }
             return Ok(user);
         }
@@ -75,6 +75,12 @@ namespace Online_Library.Controllers
 
         public IActionResult Login(UserlLoginDto user)
         {
+
+            if (user == null)
+            {
+                return BadRequest();
+            }
+
             var token = _repo.Login(user);
             return Ok(token);
         }

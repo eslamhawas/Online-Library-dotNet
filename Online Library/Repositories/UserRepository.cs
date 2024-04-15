@@ -106,11 +106,15 @@ namespace Online_Library.Repositories
         }
         public string Login(UserlLoginDto user)
         {
-            string email = user.Email;
-            var existingUser =_context.Users.Where(u => u.Email == email).FirstOrDefault();
+            var existingUser = GetUserByEmail(user);
+            
             if (existingUser == null || !VerifyPasswordHash(user.Password,existingUser.PasswordHash,existingUser.PassordSalt))
             {
                 throw new ArgumentException("There Is no User With this credntials");
+            }
+            if (existingUser.IsAccepted is false || existingUser.IsAccepted is null )
+            {
+                throw new ArgumentException("User not ceritified yet");
             }
             string token = CreateToken(existingUser);
             return(token);
@@ -160,6 +164,13 @@ namespace Online_Library.Repositories
         {
             var users = _context.Users.ToList();
             return users;
+        }
+
+        private User GetUserByEmail(UserlLoginDto user)
+        {
+            string email = user.Email;
+            var existingUser = _context.Users.Where(u => u.Email == email).FirstOrDefault();
+            return existingUser;
         }
     }
 }
