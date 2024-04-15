@@ -156,5 +156,10 @@ namespace Online_Library.Repositories
             }
         }
 
+        public IEnumerable<User> GetUsers()
+        {
+            var users = _context.Users.ToList();
+            return users;
+        }
     }
 }

@@ -4,7 +4,7 @@ using Online_Library.Interfaces;
 
 namespace Online_Library.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v1/")]
     [ApiController]
     public class UsersController : ControllerBase
     {
@@ -13,6 +13,17 @@ namespace Online_Library.Controllers
         {
             _repo = repo;
         }
+
+        [HttpGet("Users")]
+
+        public IActionResult GetUsers()
+        {
+            var users = _repo.GetUsers();
+
+            return Ok(users);
+
+        }
+
 
         [HttpGet("Accepted")]
         public IActionResult GetAllAcceptedUsers()

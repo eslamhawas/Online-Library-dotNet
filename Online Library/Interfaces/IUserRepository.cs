@@ -20,7 +20,7 @@ namespace Online_Library.Interfaces
 
         string Login(UserlLoginDto user);
 
-
+        IEnumerable<User> GetUsers();
 
 
 
