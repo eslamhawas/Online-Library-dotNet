@@ -47,7 +47,7 @@ namespace Online_Library.Controllers
             return Ok(users);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("Users/{id}")]
         public IActionResult GetById(int id)
         {
             var user = _repo.GetById(id);
