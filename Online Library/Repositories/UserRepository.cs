@@ -104,23 +104,8 @@ namespace Online_Library.Repositories
                     throw new ArgumentException("Username or email already exists.");
             }
         }
-        public string Login(UserlLoginDto user)
-        {
-            var existingUser = GetUserByEmail(user);
-            
-            if (existingUser == null || !VerifyPasswordHash(user.Password,existingUser.PasswordHash,existingUser.PassordSalt))
-            {
-                throw new ArgumentException("There Is no User With this credntials");
-            }
-            if (existingUser.IsAccepted is false || existingUser.IsAccepted is null )
-            {
-                throw new ArgumentException("User not ceritified yet");
-            }
-            string token = CreateToken(existingUser);
-            return(token);
-        }
 
-        private string CreateToken(User user)
+        public string CreateToken(User user)
         {
             List<Claim> claims = new List<Claim> 
             {
@@ -151,7 +136,7 @@ namespace Online_Library.Repositories
             }
         }
 
-        private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt ) 
+        public bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt ) 
         {
             using  (var hmac = new HMACSHA512(passwordSalt))
             {
@@ -166,7 +151,7 @@ namespace Online_Library.Repositories
             return users;
         }
 
-        private User GetUserByEmail(UserlLoginDto user)
+        public User GetUserByEmail(UserlLoginDto user)
         {
             string email = user.Email;
             var existingUser = _context.Users.Where(u => u.Email == email).FirstOrDefault();

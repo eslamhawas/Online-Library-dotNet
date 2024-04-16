@@ -76,12 +76,17 @@ namespace Online_Library.Controllers
         public IActionResult Login(UserlLoginDto user)
         {
 
-            if (user == null)
-            {
-                return BadRequest();
-            }
+            var existingUser = _repo.GetUserByEmail(user);
 
-            var token = _repo.Login(user);
+            if (existingUser == null || !_repo.VerifyPasswordHash(user.Password, existingUser.PasswordHash, existingUser.PassordSalt))
+            {
+                return NotFound("There Is no User With this credntials");
+            }
+            if (existingUser.IsAccepted is false || existingUser.IsAccepted is null)
+            {
+                return NotFound("User not Accepted yet");
+            }
+            string token = _repo.CreateToken(existingUser);
             return Ok(token);
         }
 

@@ -18,13 +18,17 @@ namespace Online_Library.Interfaces
 
         void MakeLibrarian(User user);
 
-        string Login(UserlLoginDto user);
-
         IEnumerable<User> GetUsers();
 
         string GenerateBooksReport();
 
         string GenerateBorrowedBooksReport();
+
+        User GetUserByEmail(UserlLoginDto user);
+
+        bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt);
+
+        string CreateToken(User user);
 
 
 
