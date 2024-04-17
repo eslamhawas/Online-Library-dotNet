@@ -18,7 +18,9 @@ namespace Online_Library.Repositories
 
         public IEnumerable<BorrowedBook> GetBorrowedBooks()
         {
-            throw new NotImplementedException();
+            var books = _context.BorrowedBooks.ToList();
+
+            return books;
         }
 
         public IEnumerable<BorrowedBook> GetBorrowedBooksById(int UserId)

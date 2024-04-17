@@ -14,5 +14,13 @@ namespace Online_Library.Controllers
         {
             _borrowedBooksRepository = borrowedBooksRepository;
         }
+
+        [HttpGet]
+
+        public IActionResult GetBorrowedBooks() 
+        {
+            var books = _borrowedBooksRepository.GetBorrowedBooks();
+            return Ok(books);
+        }
     }
 }
