@@ -107,9 +107,18 @@ namespace Online_Library.Repositories
 
         public string CreateToken(User user)
         {
+            string Role;
+            if(user.IsAdmin is true)
+            {
+                Role= "Admin";
+            } else
+            {
+                Role = "User";
+            }
             List<Claim> claims = new List<Claim> 
             {
-                new Claim(ClaimTypes.Name, user.UserName)
+                new Claim(ClaimTypes.Name, user.UserName),
+                 new Claim(ClaimTypes.Role,Role)
             };
 
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Online_Library.DTOS;
 using Online_Library.Interfaces;
 
@@ -6,6 +7,10 @@ namespace Online_Library.Controllers
 {
     [Route("api/v1/")]
     [ApiController]
+    /*Authorize attribute can also be usen on controller
+    to allow any access you can use AllowAnonymous*/
+   
+    //[Authorize(Roles = "Admin")]
     public class UsersController : ControllerBase
     {
         private readonly IUserRepository _repo;
@@ -58,7 +63,7 @@ namespace Online_Library.Controllers
             return Ok(user);
         }
 
-        [HttpPost("Register")]
+        [HttpPost("Register"),AllowAnonymous]
 
         public IActionResult Register(UserRegisterDto user)
         {
@@ -71,7 +76,7 @@ namespace Online_Library.Controllers
             return CreatedAtAction(nameof(Register), new { user.Email }, user);
         }
 
-        [HttpPost("Login")]
+        [HttpPost("Login"),AllowAnonymous]
 
         public IActionResult Login(UserlLoginDto user)
         {
