@@ -90,47 +90,40 @@ namespace Online_Library.Controllers
             return Ok(token);
         }
 
-        [HttpPut("Accept/{id}")]
 
-        public IActionResult Accept(int id)
+        [HttpPut("Modify/{id}")]
+
+        public IActionResult Modify(int id,ModifyUserDTO DTO) 
         {
-            var user = _repo.GetById(id);
-            if (user == null)
+            var existingUser = _repo.GetUserByName(DTO);
+
+            if (existingUser is null)
             {
-                return NotFound(user);
+                return BadRequest("Please Enter a Valid UserName");
             }
-            _repo.Accept(user);
 
-            return NoContent();
-
-
-        }
-
-        [HttpPut("Promote/{id}")]
-
-        public IActionResult MakeLibrarian(int id)
-        {
-            var user = _repo.GetById(id);
-            if (user == null)
+            if (id == 0)
             {
-                return NotFound(user);
+                _repo.Accept(existingUser);
             }
-            _repo.MakeLibrarian(user);
-            return Ok(user);
-        }
-
-        [HttpPut("Reject/{id}")]
-
-        public IActionResult Reject(int id)
-        {
-            var user = _repo.GetById(id);
-            if (user == null)
+            if (id == 1)
             {
-                return NotFound(user);
+                _repo.Reject(existingUser);
             }
-            _repo.Reject(user);
 
-            return NoContent();
+            if(id == 2)
+            {
+                _repo.MakeLibrarian(existingUser);
+            }
+
+            if (id==3)
+            {
+                _repo.MakeUser(existingUser);
+            }
+
+            return Ok("Success");
+
+
         }
 
     }

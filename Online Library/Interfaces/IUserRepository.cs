@@ -18,7 +18,7 @@ namespace Online_Library.Interfaces
 
         void MakeLibrarian(User user);
 
-        IEnumerable<User> GetUsers();
+        IEnumerable<object> GetUsers();
 
         string GenerateBooksReport();
 
@@ -30,6 +30,9 @@ namespace Online_Library.Interfaces
 
         string CreateToken(User user);
 
+        User GetUserByName(ModifyUserDTO user);
+
+        void MakeUser(User user);
 
 
 

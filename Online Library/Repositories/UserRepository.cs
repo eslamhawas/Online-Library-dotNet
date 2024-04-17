@@ -145,9 +145,17 @@ namespace Online_Library.Repositories
             }
         }
 
-        public IEnumerable<User> GetUsers()
+        public IEnumerable<object> GetUsers()
         {
-            var users = _context.Users.ToList();
+            var users = _context.Users.Select(u => new  
+            {
+                u.Id,
+                u.UserName,
+                u.DateOfBirth,
+                u.Email,
+                u.IsAdmin,
+                u.IsAccepted
+            }).ToList();
             return users;
         }
 
@@ -166,6 +174,24 @@ namespace Online_Library.Repositories
         public string GenerateBorrowedBooksReport()
         {
             throw new NotImplementedException();
+        }
+
+
+        public User GetUserByName(ModifyUserDTO user)
+        {
+            string username = user.UserName;
+            var existingUser = _context.Users.Where(u => u.UserName == username).FirstOrDefault();
+            return existingUser;
+        }
+
+        public void MakeUser(User user)
+        {
+            if (user != null)
+            {
+                user.IsAdmin = false;
+                _context.Users.Update(user);
+                _context.SaveChanges();
+            }
         }
     }
 }
