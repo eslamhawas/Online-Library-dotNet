@@ -9,6 +9,8 @@ namespace Online_Library.Models
     {
         [DataType(DataType.Date)]
         public DateTime? DateOfReturn { get; set; }
+        
+        [Key]
         public int? OrderNumber { get; set; }
 
         [DefaultValue(null)]

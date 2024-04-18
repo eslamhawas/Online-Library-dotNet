@@ -55,7 +55,7 @@ namespace Online_Library.Data
 
             modelBuilder.Entity<BorrowedBook>(entity =>
             {
-                entity.HasNoKey();
+                
 
                 entity.Property(e => e.BookIsbn)
                     .HasMaxLength(50)

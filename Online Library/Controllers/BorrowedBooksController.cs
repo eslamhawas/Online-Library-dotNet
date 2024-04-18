@@ -22,5 +22,26 @@ namespace Online_Library.Controllers
             var books = _borrowedBooksRepository.GetBorrowedBooks();
             return Ok(books);
         }
+
+        [HttpGet("{id}")]
+
+        public IActionResult GetBorrowedBookByID(int id)
+        {
+            var books = _borrowedBooksRepository.GetBorrowedBooksById(id);
+
+            return Ok(books);
+        }
+
+
+        [HttpPut("borrowedBooks/{ordernumber}/{state}")]
+        public IActionResult updateborrowedbooks(int ordernumber, bool state)
+        {
+            
+            
+               _borrowedBooksRepository.UpdateBorrowedBook(ordernumber, state);
+                return Ok();
+            
+            
+        }
     }
 }
