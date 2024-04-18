@@ -40,21 +40,25 @@ namespace Online_Library.Repositories
 
         public IEnumerable<object> GetBorrowedBooksById(int UserId)
         {
-            var returnedBooks = _context.BorrowedBooks.Where(u=>u.UserId==UserId).Join(
-             _context.Books,
-             borrowedBook => borrowedBook.BookIsbn,
-             book => book.Isbn,
-             (borrowedBook, book) => new BorrowedBookDto
-             {
-                 DateOfReturn = borrowedBook.DateOfReturn,
-                 OrderNumber = (int)borrowedBook.OrderNumber,
-                 IsAccepted = borrowedBook.IsAccepted,
-                 BookIsbn = borrowedBook.BookIsbn,
-                 UserId = borrowedBook.UserId,
-                 BookTitle = book.Title
-             }
-                )
-                .ToList();
+            var returnedBooks = _context.BorrowedBooks.Where(u => u.UserId == UserId)
+       .Join(
+         _context.Books,
+         borrowedBook => borrowedBook.BookIsbn,
+         book => book.Isbn,
+         (borrowedBook, book) => new BorrowedBookDto
+         {
+             DateOfReturn = borrowedBook.DateOfReturn,
+             OrderNumber = (int)borrowedBook.OrderNumber,
+             IsAccepted = borrowedBook.IsAccepted,
+             BookIsbn = borrowedBook.BookIsbn,
+             UserId = borrowedBook.UserId,
+             BookTitle = book.Title,
+             Price = book.Price,
+             UserName = borrowedBook.User.UserName // Joining with User table
+         }
+       )
+       .ToList();
+
             return returnedBooks;
         }
 

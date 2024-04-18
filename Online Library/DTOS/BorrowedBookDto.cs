@@ -8,6 +8,8 @@
             public string? BookIsbn { get; set; }
             public int? UserId { get; set; }
             public string? BookTitle { get; set; }
-        
+            public int Price { get; set; }
+            public string UserName { get; set;}
+
     }
 }
