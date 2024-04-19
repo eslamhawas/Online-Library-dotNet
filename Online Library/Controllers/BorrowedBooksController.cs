@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Online_Library.DTOS;
 using Online_Library.Interfaces;
+using Online_Library.Models;
 
 namespace Online_Library.Controllers
 {
@@ -42,6 +44,29 @@ namespace Online_Library.Controllers
                 return Ok();
             
             
+        }
+
+        [HttpPost()]
+        //[Authorize(Roles = "Admin")]
+        public IActionResult AddBorrowedBook(AddBorrowedBookDto borrowedBook)
+        {
+
+            if (borrowedBook == null)
+            {
+                return BadRequest();
+            }
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+
+            _borrowedBooksRepository.AddBorrowedBook(borrowedBook);
+
+            return Ok();
+
+
+
         }
     }
 }

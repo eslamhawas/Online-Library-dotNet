@@ -1,4 +1,5 @@
-﻿using Online_Library.Models;
+﻿using Online_Library.DTOS;
+using Online_Library.Models;
 
 namespace Online_Library.Interfaces
 {
@@ -7,7 +8,7 @@ namespace Online_Library.Interfaces
         IEnumerable<object> GetBorrowedBooks();
         IEnumerable<object> GetBorrowedBooksById(int UserId);
         void UpdateBorrowedBook(int OrderNumber,bool state); // set the date of return
-        void AddBorrowedBook(BorrowedBook Book); // DateOfReturn = null
+        void AddBorrowedBook(AddBorrowedBookDto Book); // DateOfReturn = null
         void RemoveBorrowedBook(int OrderNumber);
 
 
