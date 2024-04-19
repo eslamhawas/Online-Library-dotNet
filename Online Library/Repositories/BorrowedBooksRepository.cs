@@ -37,15 +37,15 @@ namespace Online_Library.Repositories
                     UserId = borrowedBook.UserId,
                     BookTitle = book.Title,
                     Price = book.Price,
-                    UserName = null // Assuming you'll populate this later
+                    UserName = null 
                 }
               )
               .Join(
                 _context.Users,
                 borrowedBookDto => borrowedBookDto.UserId,
                 user => user.Id,
-                (borrowedBookDto, user) =>  // Simplified lambda
-                  new BorrowedBookDto // Create a new instance
+                (borrowedBookDto, user) =>  
+                  new BorrowedBookDto 
                   {
                       DateOfReturn = borrowedBookDto.DateOfReturn,
                       OrderNumber = borrowedBookDto.OrderNumber,
