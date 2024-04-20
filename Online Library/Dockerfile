@@ -3,7 +3,7 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /source
 
-#COpy csproj and get all the depenedencies
+#Copy csproj and get all the depenedencies
 COPY *.csproj .
 RUN dotnet restore
 

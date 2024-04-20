@@ -1,1 +1,2 @@
+docker build --tag OnlineLibrary
 docker  run -d -p 8080:80 --name libraryapp b7c742da1c17
