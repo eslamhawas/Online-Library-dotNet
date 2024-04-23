@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace Online_Library.Models
@@ -9,7 +7,7 @@ namespace Online_Library.Models
     {
         [DataType(DataType.Date)]
         public DateTime? DateOfReturn { get; set; }
-        
+
         [Key]
         public int? OrderNumber { get; set; }
 

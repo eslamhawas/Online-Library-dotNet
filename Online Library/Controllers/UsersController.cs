@@ -9,7 +9,7 @@ namespace Online_Library.Controllers
     [ApiController]
     /*Authorize attribute can also be usen on controller
     to allow any access you can use AllowAnonymous*/
-   
+
     //[Authorize(Roles = "Admin")]
     public class UsersController : ControllerBase
     {
@@ -63,7 +63,7 @@ namespace Online_Library.Controllers
             return Ok(user);
         }
 
-        [HttpPost("Register"),AllowAnonymous]
+        [HttpPost("Register"), AllowAnonymous]
 
         public IActionResult Register(UserRegisterDto user)
         {
@@ -76,7 +76,7 @@ namespace Online_Library.Controllers
             return CreatedAtAction(nameof(Register), new { user.Email }, user);
         }
 
-        [HttpPost("Login"),AllowAnonymous]
+        [HttpPost("Login"), AllowAnonymous]
 
         public IActionResult Login(UserlLoginDto user)
         {
@@ -98,7 +98,7 @@ namespace Online_Library.Controllers
 
         [HttpPut("Modify/{id}")]
 
-        public IActionResult Modify(int id,ModifyUserDTO DTO) 
+        public IActionResult Modify(int id, ModifyUserDTO DTO)
         {
             var existingUser = _repo.GetUserByName(DTO);
 
@@ -116,12 +116,12 @@ namespace Online_Library.Controllers
                 _repo.Reject(existingUser);
             }
 
-            if(id == 2)
+            if (id == 2)
             {
                 _repo.MakeLibrarian(existingUser);
             }
 
-            if (id==3)
+            if (id == 3)
             {
                 _repo.MakeUser(existingUser);
             }

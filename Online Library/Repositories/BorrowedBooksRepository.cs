@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 using Online_Library.Data;
 using Online_Library.DTOS;
 using Online_Library.Interfaces;
@@ -37,15 +36,15 @@ namespace Online_Library.Repositories
                     UserId = borrowedBook.UserId,
                     BookTitle = book.Title,
                     Price = book.Price,
-                    UserName = null 
+                    UserName = null
                 }
               )
               .Join(
                 _context.Users,
                 borrowedBookDto => borrowedBookDto.UserId,
                 user => user.Id,
-                (borrowedBookDto, user) =>  
-                  new BorrowedBookDto 
+                (borrowedBookDto, user) =>
+                  new BorrowedBookDto
                   {
                       DateOfReturn = borrowedBookDto.DateOfReturn,
                       OrderNumber = borrowedBookDto.OrderNumber,
@@ -69,7 +68,7 @@ namespace Online_Library.Repositories
 
         public IEnumerable<object> GetBorrowedBooksById(int UserId)
         {
-            var returnedBooks = _context.BorrowedBooks.Where(u=>u.UserId==UserId)
+            var returnedBooks = _context.BorrowedBooks.Where(u => u.UserId == UserId)
        .Join(
          _context.Books, // No lambda needed here (automatic include)
          borrowedBook => borrowedBook.BookIsbn,
@@ -115,11 +114,11 @@ namespace Online_Library.Repositories
 
         public void UpdateBorrowedBook(int OrderNumber, bool state)
         {
-           
-                var borrowedBook = _context.BorrowedBooks.FirstOrDefault(x => x.OrderNumber == OrderNumber);
-                borrowedBook.IsAccepted = state;
-                _context.BorrowedBooks.Update(borrowedBook);
-                _context.SaveChanges();
+
+            var borrowedBook = _context.BorrowedBooks.FirstOrDefault(x => x.OrderNumber == OrderNumber);
+            borrowedBook.IsAccepted = state;
+            _context.BorrowedBooks.Update(borrowedBook);
+            _context.SaveChanges();
 
         }
 
@@ -127,7 +126,7 @@ namespace Online_Library.Repositories
         public void AddBorrowedBook(AddBorrowedBookDto BookDto)
         {
 
-            var Book= _mapper.Map<BorrowedBook>(BookDto);
+            var Book = _mapper.Map<BorrowedBook>(BookDto);
 
             Book.IsAccepted = null;
             Book.DateOfReturn = null;

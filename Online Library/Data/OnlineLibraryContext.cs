@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
+﻿using Microsoft.EntityFrameworkCore;
 using Online_Library.Models;
 
 namespace Online_Library.Data
@@ -21,12 +18,6 @@ namespace Online_Library.Data
         public virtual DbSet<BorrowedBook> BorrowedBooks { get; set; } = null!;
         public virtual DbSet<User> Users { get; set; } = null!;
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            if (!optionsBuilder.IsConfigured)
-            {
-            }
-        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -55,7 +46,7 @@ namespace Online_Library.Data
 
             modelBuilder.Entity<BorrowedBook>(entity =>
             {
-                
+
 
                 entity.Property(e => e.BookIsbn)
                     .HasMaxLength(50)

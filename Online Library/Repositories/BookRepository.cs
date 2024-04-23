@@ -10,7 +10,7 @@ namespace Online_Library.Repositories
 
         public BookRepository(OnlineLibraryContext context)
         {
-            _context =context;
+            _context = context;
         }
         public void AddBook(Book book)
         {

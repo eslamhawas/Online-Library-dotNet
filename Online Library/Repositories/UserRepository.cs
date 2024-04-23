@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Online_Library.Data;
 using Online_Library.DTOS;
@@ -17,7 +16,7 @@ namespace Online_Library.Repositories
         private readonly IMapper _mapper;
         private readonly IConfiguration _configuration;
 
-        public UserRepository(OnlineLibraryContext context,IMapper mapper, IConfiguration configuration )
+        public UserRepository(OnlineLibraryContext context, IMapper mapper, IConfiguration configuration)
         {
             _context = context;
             _mapper = mapper;
@@ -39,8 +38,8 @@ namespace Online_Library.Repositories
             CheckForExistingUsers(userDto);
             var user = _mapper.Map<User>(userDto);
             CreatePasswordHash(userDto.Password, out byte[] passwordHash, out byte[] passwordSalt);
-            user.PasswordHash= passwordHash;
-            user.PassordSalt= passwordSalt;
+            user.PasswordHash = passwordHash;
+            user.PassordSalt = passwordSalt;
             // auto accept new user and make them admin if there is no users in DB
             bool anyUsers = _context.Users.Any();
             if (!anyUsers)
@@ -108,14 +107,15 @@ namespace Online_Library.Repositories
         public string CreateToken(User user)
         {
             string Role;
-            if(user.IsAdmin is true)
+            if (user.IsAdmin is true)
             {
-                Role= "Admin";
-            } else
+                Role = "Admin";
+            }
+            else
             {
                 Role = "User";
             }
-            List<Claim> claims = new List<Claim> 
+            List<Claim> claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, user.UserName),
                  new Claim(ClaimTypes.Role,Role)
@@ -127,9 +127,9 @@ namespace Online_Library.Repositories
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
 
             var token = new JwtSecurityToken(
-                claims : claims,
+                claims: claims,
                 expires: DateTime.Now.AddDays(1),
-                signingCredentials : creds);
+                signingCredentials: creds);
 
             var jwt = new JwtSecurityTokenHandler().WriteToken(token);
 
@@ -145,9 +145,9 @@ namespace Online_Library.Repositories
             }
         }
 
-        public bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt ) 
+        public bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
         {
-            using  (var hmac = new HMACSHA512(passwordSalt))
+            using (var hmac = new HMACSHA512(passwordSalt))
             {
                 var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
                 return computedHash.SequenceEqual(passwordHash);
@@ -156,7 +156,7 @@ namespace Online_Library.Repositories
 
         public IEnumerable<object> GetUsers()
         {
-            var users = _context.Users.Select(u => new  
+            var users = _context.Users.Select(u => new
             {
                 u.Id,
                 u.UserName,

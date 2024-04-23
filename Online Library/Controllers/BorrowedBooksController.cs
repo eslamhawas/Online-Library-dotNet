@@ -1,8 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Online_Library.DTOS;
 using Online_Library.Interfaces;
-using Online_Library.Models;
 
 namespace Online_Library.Controllers
 {
@@ -19,7 +17,7 @@ namespace Online_Library.Controllers
 
         [HttpGet]
 
-        public IActionResult GetBorrowedBooks() 
+        public IActionResult GetBorrowedBooks()
         {
             var books = _borrowedBooksRepository.GetBorrowedBooks();
             return Ok(books);
@@ -38,12 +36,12 @@ namespace Online_Library.Controllers
         [HttpPut("borrowedBooks/{ordernumber}/{state}")]
         public IActionResult updateborrowedbooks(int ordernumber, bool state)
         {
-            
-            
-               _borrowedBooksRepository.UpdateBorrowedBook(ordernumber, state);
-                return Ok();
-            
-            
+
+
+            _borrowedBooksRepository.UpdateBorrowedBook(ordernumber, state);
+            return Ok();
+
+
         }
 
         [HttpPost()]

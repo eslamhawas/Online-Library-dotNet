@@ -31,7 +31,7 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IBorrowedBooksRepository, BorrowedBooksRepository>();
-builder.Services.AddScoped<IBooksRepository,BookRepository>();
+builder.Services.AddScoped<IBooksRepository, BookRepository>();
 builder.Services.AddDbContext<OnlineLibraryContext>(options => options.UseSqlServer(
     builder.Configuration.GetConnectionString("DefaultConnection")
     ));
