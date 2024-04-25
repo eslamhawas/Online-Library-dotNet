@@ -1,7 +1,10 @@
-﻿namespace Online_Library.DTOS
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Online_Library.DTOS
 {
     public class BorrowedBookDto
     {
+        [DataType(DataType.Date)]
         public DateTime? DateOfReturn { get; set; }
         public int OrderNumber { get; set; } // Change to int (not nullable for primary key)
         public bool? IsAccepted { get; set; }

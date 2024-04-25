@@ -42,13 +42,6 @@ builder.Services.AddCors(options =>
     {
         builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
     });
-    options.AddPolicy("reactApp", policyBuilder =>
-    {
-        policyBuilder.WithOrigins("http://localhost:3000");
-        policyBuilder.AllowAnyHeader();
-        policyBuilder.AllowAnyMethod();
-        policyBuilder.AllowCredentials();
-    });
 });
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -81,9 +74,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 app.UseSession();
-app.UseHttpsRedirection();
-
 app.UseCors("MyCorsPolicy");
+app.UseHttpsRedirection();
 
 app.UseAuthentication();
 
