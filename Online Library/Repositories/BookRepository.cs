@@ -1,4 +1,5 @@
-﻿using Online_Library.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using Online_Library.Data;
 using Online_Library.Interfaces;
 using Online_Library.Models;
 
@@ -12,24 +13,32 @@ namespace Online_Library.Repositories
         {
             _context = context;
         }
-        public void AddBook(Book book)
+
+        public void DeleteBook(Book book)
         {
-            throw new NotImplementedException();
+            _context.Books.Remove(book);
+            _context.SaveChanges();
         }
 
-        public void DeleteBook(int ISBN)
-        {
-            throw new NotImplementedException();
-        }
+        public IEnumerable<Book> GetAllBooks() => _context.Books.ToList();
 
-        public IEnumerable<Book> GetAllBooks()
-        {
-            throw new NotImplementedException();
-        }
+
+        public Book GetByIsbn(string ISBN) => _context.Books.Where(x => x.Isbn == ISBN).FirstOrDefault();
 
         public void UpdateBook(Book book)
         {
-            throw new NotImplementedException();
+            _context.ChangeTracker.DetectChanges();
+            _context.Entry(book).State = EntityState.Detached;
+            _context.Books.Update(book);
+            _context.SaveChanges();
+        }
+
+        public string AddBook(Book book)
+        {
+            _context.Books.Add(book);
+            _context.SaveChanges();
+
+            return book.Isbn;
         }
     }
 }
