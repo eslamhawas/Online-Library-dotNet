@@ -21,6 +21,10 @@ namespace Online_Library.Controllers
         public IActionResult GetAllBooks()
         {
             var books = _booksRepository.GetAllBooks();
+            if (books is null)
+            {
+                return NotFound("There is no books in DB");
+            }
             return Ok(books);
 
         }
@@ -28,6 +32,10 @@ namespace Online_Library.Controllers
         [HttpPut("Book")]
         public IActionResult UpdateBook(Book updatedBook)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             var existingBook = _booksRepository.GetByIsbn(updatedBook.Isbn);
 
             if (existingBook == null)
@@ -64,6 +72,10 @@ namespace Online_Library.Controllers
         [HttpPost("Books")]
         public IActionResult AddBook(Book book)
         {
+            if(!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             var isbn = _booksRepository.AddBook(book);
             return CreatedAtAction(nameof(GetBookbyISBN), new { isbn }, null);
         }

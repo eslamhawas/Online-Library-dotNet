@@ -35,6 +35,7 @@ builder.Services.AddScoped<IBooksRepository, BookRepository>();
 builder.Services.AddDbContext<OnlineLibraryContext>(options => options.UseSqlServer(
     builder.Configuration.GetConnectionString("DefaultConnection")
     ));
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("MyCorsPolicy", builder =>
@@ -62,6 +63,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = false
         };
     });
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(Options =>
+{
+    Options.IdleTimeout = TimeSpan.FromMinutes(30);
+    Options.Cookie.HttpOnly = true;
+    Options.Cookie.IsEssential = true;
+
+});
 
 var app = builder.Build();
 
@@ -71,7 +80,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+app.UseSession();
 app.UseHttpsRedirection();
 
 app.UseCors("MyCorsPolicy");

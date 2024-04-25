@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Online_Library.Data;
 using Online_Library.DTOS;
 using Online_Library.Interfaces;
@@ -107,20 +108,9 @@ namespace Online_Library.Repositories
             return returnedBooks;
         }
 
-        public void RemoveBorrowedBook(int OrderNumber)
-        {
-            throw new NotImplementedException();
-        }
 
-        public void UpdateBorrowedBook(int OrderNumber, bool state)
-        {
 
-            var borrowedBook = _context.BorrowedBooks.FirstOrDefault(x => x.OrderNumber == OrderNumber);
-            borrowedBook.IsAccepted = state;
-            _context.BorrowedBooks.Update(borrowedBook);
-            _context.SaveChanges();
 
-        }
 
 
         public void AddBorrowedBook(AddBorrowedBookDto BookDto)
@@ -137,9 +127,69 @@ namespace Online_Library.Repositories
 
         }
 
+
+
+        public void RemoveBorrowedBook(BorrowedBook book)
+        {
+            _context.BorrowedBooks.Remove(book);
+            _context.SaveChanges();
+        }
+
+        public BorrowedBook GetBorrowedBookByOrderNum(int OrderNumber)
+        {
+            var borrowedBook = _context.BorrowedBooks.FirstOrDefault(x => x.OrderNumber == OrderNumber);
+
+            return borrowedBook;
+        }
+
+        public string GetBorrowedBooksReport()
+        {
+            int TotalBorrowedBooks = _context.BorrowedBooks.Where(x => x.IsAccepted == true && x.IsAccepted != null).Count();
+
+            int TotalUsers = _context.BorrowedBooks.Where(x => x.IsAccepted == true && x.IsAccepted != null)
+                .Select(x => x.UserId).Distinct().Count();
+
+            string MostBorrowedBook = _context.BorrowedBooks.Where(x => x.IsAccepted == true && x.IsAccepted != null)
+                .GroupBy(x => x.BookIsbn).OrderByDescending(b => b.Count()).Select(b => b.FirstOrDefault()
+                .BookIsbnNavigation.Title).FirstOrDefault();
+
+            string leastBorrowedBooks = _context.BorrowedBooks.Where(x => x.IsAccepted == true && x.IsAccepted != null)
+                .GroupBy(x => x.BookIsbn).OrderBy(b => b.Count()).Select(b => b.FirstOrDefault().BookIsbnNavigation.Title).FirstOrDefault();
+
+            return ("Total Borrowed Books is :" + TotalBorrowedBooks + "\n Total Users number is :" + TotalUsers +
+                "\n The Most Borrowed Book is :" + MostBorrowedBook + "\n The Least Borrowed Book is :" + leastBorrowedBooks);
+        }
+
+
+
         private int GetRandomNumber(int min, int max)
         {
             return random.Next(min, max); // Generates a random number between min (inclusive) and max (exclusive)
+        }
+
+        public string UpdateBorrowedBooks(BorrowedBookUpdateDto borrowedBookUpdateDto)
+        {
+             
+            var borrowedBook = _context.BorrowedBooks.FirstOrDefault(x => x.OrderNumber == borrowedBookUpdateDto.OrderNumber);
+
+            
+            borrowedBook.IsAccepted = borrowedBookUpdateDto.IsAccepted;
+            
+            if (borrowedBookUpdateDto.IsAccepted)
+            {
+                borrowedBook.DateOfReturn = borrowedBookUpdateDto.DateOfReturn;
+                var book = _context.Books.Where(x => x.Isbn == borrowedBook.BookIsbn).FirstOrDefault();
+                book.StockNumber -= 1;
+                _context.Books.Update(book);
+                _context.SaveChanges();
+            }
+            
+            _context.BorrowedBooks.Update(borrowedBook);
+            _context.SaveChanges();
+
+            return "updated successfully";
+                
+          
         }
     }
 }

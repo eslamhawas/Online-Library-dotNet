@@ -14,9 +14,12 @@ namespace Online_Library.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUserRepository _repo;
-        public UsersController(IUserRepository repo)
+        private readonly IHttpContextAccessor _httpcontextacessor;
+
+        public UsersController(IUserRepository repo, [FromServices] IHttpContextAccessor httpContextAccessor)
         {
             _repo = repo;
+            _httpcontextacessor = httpContextAccessor;
         }
 
         [HttpGet("Users")]
@@ -76,11 +79,16 @@ namespace Online_Library.Controllers
             return CreatedAtAction(nameof(Register), new { user.Email }, user);
         }
 
+       
         [HttpPost("Login"), AllowAnonymous]
 
         public IActionResult Login(UserlLoginDto user)
         {
-
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var session = _httpcontextacessor.HttpContext.Session;
             var existingUser = _repo.GetUserByEmail(user);
 
             if (existingUser == null || !_repo.VerifyPasswordHash(user.Password, existingUser.PasswordHash, existingUser.PassordSalt))
@@ -92,19 +100,25 @@ namespace Online_Library.Controllers
                 return NotFound("User not Accepted yet");
             }
             string token = _repo.CreateToken(existingUser);
+            session.SetString("username", existingUser.UserName);
+            session.SetString("email", existingUser.Email);
             return Ok(token);
         }
 
 
         [HttpPut("Modify/{id}")]
 
-        public IActionResult Modify(int id, ModifyUserDTO DTO)
+        public IActionResult Modify(int id,[FromBody] ModifyUserDTO DTO)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             var existingUser = _repo.GetUserByName(DTO);
 
             if (existingUser is null)
             {
-                return BadRequest("Please Enter a Valid UserName");
+                return BadRequest("There is no user with this username");
             }
 
             if (id == 0)

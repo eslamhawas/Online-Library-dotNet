@@ -5,7 +5,7 @@ using Online_Library.Interfaces;
 
 namespace Online_Library.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v1/borrowedBooks")]
     [ApiController]
     [Authorize(Roles = "Admin")]
     public class BorrowedBooksController : ControllerBase
@@ -25,29 +25,25 @@ namespace Online_Library.Controllers
             return Ok(books);
         }
 
-        [HttpGet("{id}"),AllowAnonymous]
+
+
+        [HttpGet("{id}"), AllowAnonymous]
 
         public IActionResult GetBorrowedBookByID(int id)
         {
             var books = _borrowedBooksRepository.GetBorrowedBooksById(id);
 
+            if (books == null)
+            {
+                return NotFound("There is no record for this user");
+            }
+
             return Ok(books);
         }
 
 
-        [HttpPut("borrowedBooks/{ordernumber}/{state}")]
-        public IActionResult updateborrowedbooks(int ordernumber, bool state)
-        {
 
-
-            _borrowedBooksRepository.UpdateBorrowedBook(ordernumber, state);
-            return Ok();
-
-
-        }
-
-        [HttpPost()]
-        //[Authorize(Roles = "Admin")]
+        [HttpPost(), AllowAnonymous]
         public IActionResult AddBorrowedBook(AddBorrowedBookDto borrowedBook)
         {
 
@@ -68,5 +64,49 @@ namespace Online_Library.Controllers
 
 
         }
+
+        [HttpGet("report")]
+        public IActionResult GetBorrowedBooksReport()
+        {
+            var BorrowedBooks = _borrowedBooksRepository.GetBorrowedBooksReport();
+
+            return Ok(BorrowedBooks);
+        }
+
+
+
+
+        [HttpDelete("{ordernumber}")]
+
+        public IActionResult DeleteBorrowedBook(int ordernumber)
+        {
+            var book = _borrowedBooksRepository.GetBorrowedBookByOrderNum(ordernumber);
+            if (book == null)
+            {
+                return NotFound("Borrowed book with order number " + ordernumber + " not found.");
+            }
+            _borrowedBooksRepository.RemoveBorrowedBook(book);
+            return Ok("Order number: " + ordernumber + " has been deleted successfully");
+
+        }
+
+
+        [HttpPut("update")]
+        public IActionResult UpdateBorrowedBooks(BorrowedBookUpdateDto borrowedBookUpdateDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var result = _borrowedBooksRepository.UpdateBorrowedBooks(borrowedBookUpdateDto);
+
+            return Ok(result);
+
+        }
+
+
+
+
     }
 }
