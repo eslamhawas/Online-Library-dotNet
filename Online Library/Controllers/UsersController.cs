@@ -10,7 +10,7 @@ namespace Online_Library.Controllers
     /*Authorize attribute can also be usen on controller
     to allow any access you can use AllowAnonymous*/
 
-    //[Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin")]
     public class UsersController : ControllerBase
     {
         private readonly IUserRepository _repo;

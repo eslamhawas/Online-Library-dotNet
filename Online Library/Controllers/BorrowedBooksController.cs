@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Online_Library.DTOS;
 using Online_Library.Interfaces;
 
@@ -6,6 +7,7 @@ namespace Online_Library.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Admin")]
     public class BorrowedBooksController : ControllerBase
     {
         private readonly IBorrowedBooksRepository _borrowedBooksRepository;
