@@ -25,7 +25,7 @@ namespace Online_Library.Controllers
             return Ok(books);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id}"),AllowAnonymous]
 
         public IActionResult GetBorrowedBookByID(int id)
         {
