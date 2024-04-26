@@ -21,6 +21,18 @@ namespace Online_Library.Controllers
             _repo = repo;
             _httpcontextacessor = httpContextAccessor;
         }
+        [HttpOptions("{id}")]
+        public IActionResult PreflightRoute(int id)
+        {
+            return NoContent();
+        }
+
+        
+        [HttpOptions]
+        public IActionResult PreflightRoute()
+        {
+            return NoContent();
+        }
 
         [HttpGet("Users")]
 
@@ -66,6 +78,12 @@ namespace Online_Library.Controllers
             return Ok(user);
         }
 
+        [HttpOptions("Register")]
+        public IActionResult PreflightRoutes()
+        {
+            return NoContent();
+        }
+
         [HttpPost("Register"), AllowAnonymous]
 
         public IActionResult Register(UserRegisterDto user)
@@ -79,7 +97,12 @@ namespace Online_Library.Controllers
             return CreatedAtAction(nameof(Register), new { user.Email }, user);
         }
 
-       
+        [HttpOptions("Login")]
+        public IActionResult PreflightRoutess()
+        {
+            return NoContent();
+        }
+
         [HttpPost("Login"), AllowAnonymous]
 
         public IActionResult Login(UserlLoginDto user)
