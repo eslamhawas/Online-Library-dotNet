@@ -75,11 +75,21 @@ namespace Online_Library.Controllers
             {
                 return BadRequest(ModelState);
             }
+            string userName = user.UserName;
+            string email = user.Email;
+            var existingUser = _repo.CheckForExistingUsers(user);
+
+            if (!(existingUser == null))
+            {
+                return BadRequest("Username or email already exists");
+            }
+
+
             _repo.Register(user);
             return CreatedAtAction(nameof(Register), new { user.Email }, user);
         }
 
-       
+
         [HttpPost("Login"), AllowAnonymous]
 
         public IActionResult Login(UserlLoginDto user)
@@ -108,7 +118,7 @@ namespace Online_Library.Controllers
 
         [HttpPut("Modify/{id}")]
 
-        public IActionResult Modify(int id,[FromBody] ModifyUserDTO DTO)
+        public IActionResult Modify(int id, [FromBody] ModifyUserDTO DTO)
         {
             if (!ModelState.IsValid)
             {

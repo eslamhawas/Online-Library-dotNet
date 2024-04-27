@@ -20,10 +20,6 @@ namespace Online_Library.Interfaces
 
         IEnumerable<object> GetUsers();
 
-        string GenerateBooksReport();
-
-        string GenerateBorrowedBooksReport();
-
         User GetUserByEmail(UserlLoginDto user);
 
         bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt);
@@ -34,6 +30,7 @@ namespace Online_Library.Interfaces
 
         void MakeUser(User user);
 
+        User CheckForExistingUsers(UserRegisterDto user);
 
 
 

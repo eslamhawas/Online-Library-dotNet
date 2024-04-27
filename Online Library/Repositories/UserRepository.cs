@@ -36,7 +36,7 @@ namespace Online_Library.Repositories
 
         public void Register(UserRegisterDto userDto)
         {
-            CheckForExistingUsers(userDto);
+            
             var user = _mapper.Map<User>(userDto);
             CreatePasswordHash(userDto.Password, out byte[] passwordHash, out byte[] passwordSalt);
             user.PasswordHash = passwordHash;
@@ -86,23 +86,13 @@ namespace Online_Library.Repositories
                 _context.SaveChanges();
             }
         }
-        private void CheckForExistingUsers(UserRegisterDto user)
+        public User CheckForExistingUsers(UserRegisterDto user)
         {
             string userName = user.UserName;
             string email = user.Email;
-            var existingUser = _context.Users.Where(e => e.UserName == userName).FirstOrDefault();
+            var existingUser = _context.Users.Where(e => e.UserName == userName || e.Email == email).FirstOrDefault();
 
-            if (_context.Users.Any(u => u.UserName == userName || u.Email == email))
-            {
-                bool? status = existingUser.IsAccepted;
-                if (status == false)
-                {
-                    throw new ArgumentException("This user was already rejected," +
-                                                 "Call the librarian for more info");
-                }
-                else
-                    throw new ArgumentException("Username or email already exists.");
-            }
+            return existingUser;
         }
 
         public string CreateToken(User user)
@@ -174,16 +164,6 @@ namespace Online_Library.Repositories
             string email = user.Email;
             var existingUser = _context.Users.Where(u => u.Email == email).FirstOrDefault();
             return existingUser;
-        }
-
-        public string GenerateBooksReport()
-        {
-            throw new NotImplementedException();
-        }
-
-        public string GenerateBorrowedBooksReport()
-        {
-            throw new NotImplementedException();
         }
 
 
