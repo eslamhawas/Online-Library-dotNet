@@ -112,7 +112,10 @@ namespace Online_Library.Controllers
             string token = _repo.CreateToken(existingUser);
             session.SetString("username", existingUser.UserName);
             session.SetString("email", existingUser.Email);
-            return Ok(token);
+            var tokenid = new TokenID();
+            tokenid.jwt = token;
+            tokenid.id = existingUser.Id;
+            return Ok(tokenid);
         }
 
 
