@@ -115,6 +115,7 @@ namespace Online_Library.Controllers
             var tokenid = new TokenID();
             tokenid.jwt = token;
             tokenid.id = existingUser.Id;
+            tokenid.session = session;
             return Ok(tokenid);
         }
 

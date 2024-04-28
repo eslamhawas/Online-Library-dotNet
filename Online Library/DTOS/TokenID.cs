@@ -4,5 +4,6 @@
     {
         public string jwt { get; set; }
         public int id { get; set; }
+        public ISession session { get; set; }
     }
 }
