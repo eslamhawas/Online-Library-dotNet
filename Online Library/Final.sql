@@ -7,7 +7,7 @@ CREATE DATABASE OnlineLibrary
  Price int NOT NULL ,
  StockNumber int )
 
- CREATE TABLE dbo.Users(
+CREATE TABLE dbo.Users(
  ID int IDENTITY (1,1) PRIMARY KEY,
  UserName varchar(50) not null ,
  DateOfBirth DATE ,
@@ -15,7 +15,9 @@ CREATE DATABASE OnlineLibrary
  IsAdmin BIT null ,
  IsAccepted BIT null,
  PasswordHash varbinary(1000),
- PassordSalt varbinary(1000))
+ PassordSalt varbinary(1000),
+ EncryptionKey nvarchar(50),
+IVKey nvarchar(50))
 
  
  CREATE TABLE dbo.BorrowedBooks(

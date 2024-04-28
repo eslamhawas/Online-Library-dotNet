@@ -85,6 +85,12 @@ namespace Online_Library.Data
                 entity.Property(e => e.UserName)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+                entity.Property(e => e.encryptionkey)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+                entity.Property(e => e.IVKey)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
             });
 
             OnModelCreatingPartial(modelBuilder);

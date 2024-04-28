@@ -12,7 +12,7 @@ namespace Online_Library.Interfaces
 
         void Reject(User user);
 
-        User GetById(int Id);
+        UserDto GetById(int Id);
 
         void Accept(User user);
 

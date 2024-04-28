@@ -25,5 +25,7 @@ namespace Online_Library.Models
         public bool? IsAccepted { get; set; }
         public byte[]? PasswordHash { get; set; }
         public byte[]? PassordSalt { get; set; }
+        public string encryptionkey { get; set; }
+        public string IVKey { get; set; }
     }
 }

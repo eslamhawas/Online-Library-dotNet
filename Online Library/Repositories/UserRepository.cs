@@ -7,6 +7,7 @@ using Online_Library.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
+using System.Text;
 
 namespace Online_Library.Repositories
 {
@@ -36,7 +37,7 @@ namespace Online_Library.Repositories
 
         public void Register(UserRegisterDto userDto)
         {
-            
+
             var user = _mapper.Map<User>(userDto);
             CreatePasswordHash(userDto.Password, out byte[] passwordHash, out byte[] passwordSalt);
             user.PasswordHash = passwordHash;
@@ -48,8 +49,14 @@ namespace Online_Library.Repositories
                 user.IsAccepted = true;
                 user.IsAdmin = true;
             }
+            string encryptionkey = GenerateKey();
+            string iv;
+            user.UserName = Encrypt(user.UserName, encryptionkey, out iv);
+            user.encryptionkey = encryptionkey;
+            user.IVKey = iv;
             _context.Users.Add(user);
             _context.SaveChanges();
+
         }
 
         public void Reject(User user)
@@ -64,18 +71,42 @@ namespace Online_Library.Repositories
         }
         public IEnumerable<User> GetPendingUsers()
         {
-            return _context.Users.Where(u => u.IsAccepted == null).OrderBy(e => e.Id).ToList();
+            var pendingUsers = _context.Users.Where(u => u.IsAccepted == null).OrderBy(e => e.Id).ToList();
+
+            foreach (var user in pendingUsers)
+            {
+                string decryptedUsername = Decrypt(user.UserName, user.encryptionkey, user.IVKey);
+                user.UserName = decryptedUsername;
+            }
+
+            return pendingUsers;
         }
         public IEnumerable<User> GetAcceptedUsers()
         {
-            return _context.Users.Where(u => u.IsAccepted == true).OrderBy(e => e.Id).ToList();
+            var acceptedUsers = _context.Users.Where(u => u.IsAccepted == true).OrderBy(e => e.Id).ToList();
+
+            foreach (var user in acceptedUsers)
+            {
+                string decryptedUsername = Decrypt(user.UserName, user.encryptionkey, user.IVKey);
+                user.UserName = decryptedUsername;
+            }
+
+            return acceptedUsers;
         }
 
-        public User GetById(int Id)
+        public UserDto GetById(int Id)
         {
             var user = _context.Users.Where(e => e.Id == Id).FirstOrDefault();
-            return user;
+
+            if (user != null)
+            {
+                string decryptedUsername = Decrypt(user.UserName, user.encryptionkey, user.IVKey);
+                user.UserName = decryptedUsername;
+            }
+            var userDto = _mapper.Map<UserDto>(user);
+            return userDto;
         }
+         
 
         public void MakeLibrarian(User user)
         {
@@ -144,25 +175,124 @@ namespace Online_Library.Repositories
                 return computedHash.SequenceEqual(passwordHash);
             }
         }
+        public static string GenerateKey()
+        {
+            string KeyBase64 = "";
+            using (Aes aes = Aes.Create())
+            {
+                aes.KeySize = 256;
+                aes.GenerateKey();
+                KeyBase64 = Convert.ToBase64String(aes.Key);
+            }
+            return KeyBase64;
+        }
+        public static string Encrypt(string Plaintext, string Key, out string IVKey)
+        {
+            using (Aes aes = Aes.Create())
+            {
+                aes.Padding = PaddingMode.Zeros;
+                aes.Key = Convert.FromBase64String(Key);
+                aes.GenerateIV();
+                IVKey = Convert.ToBase64String(aes.IV);
+                ICryptoTransform encryptor = aes.CreateEncryptor();
+                byte[] encryptedData;
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    using (CryptoStream cs = new CryptoStream(ms, encryptor, CryptoStreamMode.Write))
+                    {
+                        using (StreamWriter sw = new StreamWriter(cs))
+                        {
+                            sw.Write(Plaintext);
+                        }
+                        encryptedData = ms.ToArray();
+                    }
+                }
+                return Convert.ToBase64String(encryptedData);
+            }
+        }
+        public static string Decrypt(string ciphertext, string Key, string IVKey)
+        {
+            using (Aes aes = Aes.Create())
+            {
+                aes.Padding = PaddingMode.Zeros;
+                aes.Key = Convert.FromBase64String(Key);
+                aes.IV = Convert.FromBase64String(IVKey);
+
+                ICryptoTransform decryptor = aes.CreateDecryptor();
+                byte[] cipher = Convert.FromBase64String(ciphertext);
+
+                using (MemoryStream ms = new MemoryStream(cipher))
+                {
+                    using (CryptoStream cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Read))
+                    {
+
+                        byte[] decryptedBytes = new byte[cipher.Length];
+                        int decryptedByteCount = cs.Read(decryptedBytes, 0, decryptedBytes.Length);
+
+
+                        string plainText = Encoding.UTF8.GetString(decryptedBytes, 0, decryptedByteCount).TrimEnd('\0');
+
+                        return plainText;
+                    }
+                }
+            }
+        }
+
+
+        private string GetUserEncryptionKey(int userId)
+        {
+
+            var userEncryptionKey = _context.Users
+                .Where(uek => uek.Id == userId)
+                .Select(uek => uek.encryptionkey)
+                .FirstOrDefault();
+
+            return userEncryptionKey;
+        }
 
         public IEnumerable<object> GetUsers()
         {
-            var users = _context.Users.Select(u => new
+            List<object> decryptedUsers = new List<object>();
+
+            var usersWithKeys = _context.Users
+                .Where(u => u.encryptionkey != null && u.IVKey != null)
+                .ToList();
+
+            foreach (var user in usersWithKeys)
             {
-                u.Id,
-                u.UserName,
-                u.DateOfBirth,
-                u.Email,
-                u.IsAdmin,
-                u.IsAccepted
-            }).ToList();
-            return users;
+                string decryptionKey = GetUserEncryptionKey(user.Id);
+                string decryptedUserName = Decrypt(user.UserName, decryptionKey, user.IVKey);
+
+
+                var decryptedUser = new
+                {
+                    user.Id,
+                    UserName = decryptedUserName,
+                    user.DateOfBirth,
+                    user.Email,
+                    user.IsAdmin,
+                    user.IsAccepted
+
+                };
+
+                decryptedUsers.Add(decryptedUser);
+            }
+
+            return decryptedUsers;
+
         }
 
         public User GetUserByEmail(UserlLoginDto user)
         {
             string email = user.Email;
             var existingUser = _context.Users.Where(u => u.Email == email).FirstOrDefault();
+
+            if (existingUser != null)
+            {
+                string decryptedUsername = Decrypt(existingUser.UserName, existingUser.encryptionkey, existingUser.IVKey);
+                existingUser.UserName = decryptedUsername;
+            }
+
             return existingUser;
         }
 
