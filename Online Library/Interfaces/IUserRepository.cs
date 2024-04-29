@@ -26,7 +26,7 @@ namespace Online_Library.Interfaces
 
         string CreateToken(User user);
 
-        User GetUserByName(ModifyUserDTO user);
+        User GetUserByID(ModifyUserDTO user);
 
         void MakeUser(User user);
 

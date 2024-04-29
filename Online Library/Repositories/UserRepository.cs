@@ -39,6 +39,8 @@ namespace Online_Library.Repositories
         {
 
             var user = _mapper.Map<User>(userDto);
+            user.IsAccepted=null;
+            user.IsAdmin=false;
             CreatePasswordHash(userDto.Password, out byte[] passwordHash, out byte[] passwordSalt);
             user.PasswordHash = passwordHash;
             user.PassordSalt = passwordSalt;
@@ -297,10 +299,10 @@ namespace Online_Library.Repositories
         }
 
 
-        public User GetUserByName(ModifyUserDTO user)
+        public User GetUserByID(ModifyUserDTO user)
         {
-            string username = user.UserName;
-            var existingUser = _context.Users.Where(u => u.UserName == username).FirstOrDefault();
+            int ID = user.userid;
+            var existingUser = _context.Users.Where(u => u.Id == ID).FirstOrDefault();
             return existingUser;
         }
 

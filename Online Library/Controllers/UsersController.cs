@@ -75,6 +75,10 @@ namespace Online_Library.Controllers
             {
                 return BadRequest(ModelState);
             }
+            if (user.Password != user.RePassword)
+            {
+                return BadRequest("Password And Confirm Password Doesn't Match");
+            }
             string userName = user.UserName;
             string email = user.Email;
             var existingUser = _repo.CheckForExistingUsers(user);
@@ -120,36 +124,36 @@ namespace Online_Library.Controllers
         }
 
 
-        [HttpPut("Modify/{id}")]
+        [HttpPut("Modify/{action}")]
 
-        public IActionResult Modify(int id, [FromBody] ModifyUserDTO DTO)
+        public IActionResult Modify(int action, [FromBody] ModifyUserDTO DTO)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            var existingUser = _repo.GetUserByName(DTO);
+            var existingUser = _repo.GetUserByID(DTO);
 
             if (existingUser is null)
             {
                 return BadRequest("There is no user with this username");
             }
 
-            if (id == 0)
+            if (action == 0)
             {
                 _repo.Accept(existingUser);
             }
-            if (id == 1)
+            if (action == 1)
             {
                 _repo.Reject(existingUser);
             }
 
-            if (id == 2)
+            if (action == 2)
             {
                 _repo.MakeLibrarian(existingUser);
             }
 
-            if (id == 3)
+            if (action == 3)
             {
                 _repo.MakeUser(existingUser);
             }

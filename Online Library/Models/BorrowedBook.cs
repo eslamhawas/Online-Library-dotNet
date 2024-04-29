@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Online_Library.Models
 {
@@ -17,8 +18,9 @@ namespace Online_Library.Models
         public string? BookIsbn { get; set; }
         [Required]
         public int? UserId { get; set; }
-
+        [JsonIgnore]
         public virtual Book? BookIsbnNavigation { get; set; }
+        [JsonIgnore]
         public virtual User? User { get; set; }
     }
 }

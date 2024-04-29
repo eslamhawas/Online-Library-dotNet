@@ -16,6 +16,7 @@ namespace Online_Library.Models
         public DateTime? DateOfBirth { get; set; }
 
         [Required]
+        [EmailAddress]
         public string Email { get; set; } = null!;
 
         [DefaultValue(false)]
