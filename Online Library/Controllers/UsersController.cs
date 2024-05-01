@@ -33,28 +33,6 @@ namespace Online_Library.Controllers
         }
 
 
-        [HttpGet("Accepted")]
-        public IActionResult GetAllAcceptedUsers()
-        {
-            var users = _repo.GetAcceptedUsers();
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            return Ok(users);
-        }
-
-        [HttpGet("Pending")]
-        public IActionResult GetPendingUsers()
-        {
-            var users = _repo.GetPendingUsers();
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            return Ok(users);
-        }
-
         [HttpGet("Users/{id}")]
         public IActionResult GetById(int id)
         {
@@ -125,7 +103,7 @@ namespace Online_Library.Controllers
 
         [HttpPut("Modify/{id}")]
 
-        public IActionResult Modify([FromRoute]int id, [FromBody] ModifyUserDTO DTO)
+        public IActionResult Modify([FromRoute] int id, [FromBody] ModifyUserDTO DTO)
         {
             if (!ModelState.IsValid)
             {

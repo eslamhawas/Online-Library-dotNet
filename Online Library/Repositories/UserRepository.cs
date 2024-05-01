@@ -71,31 +71,6 @@ namespace Online_Library.Repositories
                 _context.SaveChanges();
             }
         }
-        public IEnumerable<User> GetPendingUsers()
-        {
-            var pendingUsers = _context.Users.Where(u => u.IsAccepted == null).OrderBy(e => e.Id).ToList();
-
-            foreach (var user in pendingUsers)
-            {
-                string decryptedUsername = Decrypt(user.UserName, user.encryptionkey, user.IVKey);
-                user.UserName = decryptedUsername;
-            }
-
-            return pendingUsers;
-        }
-        public IEnumerable<User> GetAcceptedUsers()
-        {
-            var acceptedUsers = _context.Users.Where(u => u.IsAccepted == true).OrderBy(e => e.Id).ToList();
-
-            foreach (var user in acceptedUsers)
-            {
-                string decryptedUsername = Decrypt(user.UserName, user.encryptionkey, user.IVKey);
-                user.UserName = decryptedUsername;
-            }
-
-            return acceptedUsers;
-        }
-
         public UserDto GetById(int Id)
         {
             var user = _context.Users.Where(e => e.Id == Id).FirstOrDefault();
