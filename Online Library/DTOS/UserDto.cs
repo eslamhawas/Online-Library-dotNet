@@ -11,9 +11,9 @@ namespace Online_Library.DTOS
         public int Id { get; set; }
         [Required]
         public string UserName { get; set; } = null!;
-
+        [Required]
         [DataType(DataType.Date)]
-        public DateTime? DateOfBirth { get; set; }
+        public DateOnly? DateOfBirth { get; set; }
 
         [Required]
         public string Email { get; set; } = null!;

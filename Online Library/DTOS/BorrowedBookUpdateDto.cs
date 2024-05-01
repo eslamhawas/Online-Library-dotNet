@@ -9,6 +9,6 @@ namespace Online_Library.DTOS
         [Required]
         public bool IsAccepted { get; set; }
         [DataType(DataType.Date)]
-        public DateTime? DateOfReturn { get; set; }
+        public DateOnly? DateOfReturn { get; set; }
     }
 }

@@ -8,14 +8,14 @@ namespace Online_Library.DTOS
         public string UserName { get; set; } = null!;
 
         [DataType(DataType.Date)]
-        public DateTime? DateOfBirth { get; set; }
+        public DateOnly? DateOfBirth { get; set; }
 
         [Required]
         [EmailAddress]
         public string Email { get; set; } = null!;
-
+        [Required]
         public string Password { get; set; }
-
+        [Required]
         public string RePassword { get; set; }
     }
 }

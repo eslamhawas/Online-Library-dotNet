@@ -123,9 +123,9 @@ namespace Online_Library.Controllers
         }
 
 
-        [HttpPut("Modify/{action}")]
+        [HttpPut("Modify/{id}")]
 
-        public IActionResult Modify(int action, [FromBody] ModifyUserDTO DTO)
+        public IActionResult Modify([FromRoute]int id, [FromBody] ModifyUserDTO DTO)
         {
             if (!ModelState.IsValid)
             {
@@ -138,21 +138,21 @@ namespace Online_Library.Controllers
                 return BadRequest("There is no user with this username");
             }
 
-            if (action == 0)
+            if (id == 0)
             {
                 _repo.Accept(existingUser);
             }
-            if (action == 1)
+            if (id == 1)
             {
                 _repo.Reject(existingUser);
             }
 
-            if (action == 2)
+            if (id == 2)
             {
                 _repo.MakeLibrarian(existingUser);
             }
 
-            if (action == 3)
+            if (id == 3)
             {
                 _repo.MakeUser(existingUser);
             }

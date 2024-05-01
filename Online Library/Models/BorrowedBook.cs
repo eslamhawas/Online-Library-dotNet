@@ -7,7 +7,7 @@ namespace Online_Library.Models
     public partial class BorrowedBook
     {
         [DataType(DataType.Date)]
-        public DateTime? DateOfReturn { get; set; }
+        public DateOnly? DateOfReturn { get; set; }
 
         [Key]
         public int? OrderNumber { get; set; }

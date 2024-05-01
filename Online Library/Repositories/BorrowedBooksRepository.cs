@@ -21,7 +21,7 @@ namespace Online_Library.Repositories
 
 
 
-        public IEnumerable<object> GetBorrowedBooks()
+        public IEnumerable<BorrowedBookDto> GetBorrowedBooks()
         {
             var returnedBooks = _context.BorrowedBooks
               .Join(
@@ -67,7 +67,7 @@ namespace Online_Library.Repositories
 
 
 
-        public IEnumerable<object> GetBorrowedBooksById(int UserId)
+        public IEnumerable<BorrowedBookDto> GetBorrowedBooksById(int UserId)
         {
             var returnedBooks = _context.BorrowedBooks.Where(u => u.UserId == UserId)
        .Join(

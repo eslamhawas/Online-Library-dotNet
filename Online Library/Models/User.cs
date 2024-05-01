@@ -13,7 +13,7 @@ namespace Online_Library.Models
         public string UserName { get; set; } = null!;
 
         [DataType(DataType.Date)]
-        public DateTime? DateOfBirth { get; set; }
+        public DateOnly? DateOfBirth { get; set; }
 
         [Required]
         [EmailAddress]

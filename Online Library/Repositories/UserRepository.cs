@@ -39,8 +39,8 @@ namespace Online_Library.Repositories
         {
 
             var user = _mapper.Map<User>(userDto);
-            user.IsAccepted=null;
-            user.IsAdmin=false;
+            user.IsAccepted = null;
+            user.IsAdmin = false;
             CreatePasswordHash(userDto.Password, out byte[] passwordHash, out byte[] passwordSalt);
             user.PasswordHash = passwordHash;
             user.PassordSalt = passwordSalt;
@@ -108,7 +108,7 @@ namespace Online_Library.Repositories
             var userDto = _mapper.Map<UserDto>(user);
             return userDto;
         }
-         
+
 
         public void MakeLibrarian(User user)
         {
@@ -177,7 +177,7 @@ namespace Online_Library.Repositories
                 return computedHash.SequenceEqual(passwordHash);
             }
         }
-        public static string GenerateKey()
+        public string GenerateKey()
         {
             string KeyBase64 = "";
             using (Aes aes = Aes.Create())
@@ -188,7 +188,7 @@ namespace Online_Library.Repositories
             }
             return KeyBase64;
         }
-        public static string Encrypt(string Plaintext, string Key, out string IVKey)
+        public string Encrypt(string Plaintext, string Key, out string IVKey)
         {
             using (Aes aes = Aes.Create())
             {
@@ -212,7 +212,7 @@ namespace Online_Library.Repositories
                 return Convert.ToBase64String(encryptedData);
             }
         }
-        public static string Decrypt(string ciphertext, string Key, string IVKey)
+        public string Decrypt(string ciphertext, string Key, string IVKey)
         {
             using (Aes aes = Aes.Create())
             {

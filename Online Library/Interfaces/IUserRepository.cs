@@ -31,6 +31,12 @@ namespace Online_Library.Interfaces
         void MakeUser(User user);
 
         User CheckForExistingUsers(UserRegisterDto user);
+        
+        string Decrypt(string ciphertext, string Key, string IVKey);
+
+        string Encrypt(string Plaintext, string Key, out string IVKey);
+
+        string GenerateKey();
 
 
 
