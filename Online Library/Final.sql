@@ -15,9 +15,8 @@ CREATE TABLE dbo.Users(
  IsAdmin BIT null ,
  IsAccepted BIT null,
  PasswordHash varbinary(1000),
- PassordSalt varbinary(1000),
- EncryptionKey nvarchar(50),
-IVKey nvarchar(50))
+ PassordSalt varbinary(1000)
+)
 
  
  CREATE TABLE dbo.BorrowedBooks(
