@@ -6,7 +6,7 @@ using Online_Library.DTOS;
 
 namespace Online_Library.Controllers
 {
-    [Route("api/v1")]
+    [Route("api/v1/")]
     [ApiController]
     public class AuthController : ControllerBase
     {
