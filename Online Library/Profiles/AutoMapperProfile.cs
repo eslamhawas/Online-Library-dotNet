@@ -10,7 +10,7 @@ namespace Online_Library.Profiles
         {
             CreateMap<UserRegisterDto, Users>();
             CreateMap<AddBorrowedBookDto, BorrowedBook>();
-            CreateMap<Users,UserDto>();
+            
         }
     }
 }
