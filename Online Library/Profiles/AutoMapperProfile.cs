@@ -8,9 +8,9 @@ namespace Online_Library.Profiles
     {
         public AutoMapperProfile()
         {
-            CreateMap<UserRegisterDto, User>();
+            CreateMap<UserRegisterDto, Users>();
             CreateMap<AddBorrowedBookDto, BorrowedBook>();
-            CreateMap<User,UserDto>();
+            CreateMap<Users,UserDto>();
         }
     }
 }

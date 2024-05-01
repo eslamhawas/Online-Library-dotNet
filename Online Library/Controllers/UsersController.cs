@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Online_Library.Data;
 using Online_Library.DTOS;
-using Online_Library.Interfaces;
+using Online_Library.Models;
 
 namespace Online_Library.Controllers
 {
@@ -13,20 +15,20 @@ namespace Online_Library.Controllers
     [Authorize(Roles = "Admin")]
     public class UsersController : ControllerBase
     {
-        private readonly IUserRepository _repo;
+        private readonly IDataRepository<Users> _userrepo;
         private readonly IHttpContextAccessor _httpcontextacessor;
 
-        public UsersController(IUserRepository repo, [FromServices] IHttpContextAccessor httpContextAccessor)
+        public UsersController([FromServices] IHttpContextAccessor httpContextAccessor, IDataRepository<Users> repo)
         {
-            _repo = repo;
             _httpcontextacessor = httpContextAccessor;
+            _userrepo = repo;
         }
 
         [HttpGet("Users")]
 
-        public IActionResult GetUsers()
+        public async Task<IActionResult> GetUsers()
         {
-            var users = _repo.GetUsers();
+            var users = await _userrepo.GetAllAsync();
 
             return Ok(users);
 
@@ -34,9 +36,9 @@ namespace Online_Library.Controllers
 
 
         [HttpGet("Users/{id}")]
-        public IActionResult GetById(int id)
+        public async Task<IActionResult> GetById(int id)
         {
-            var user = _repo.GetById(id);
+            var user = await _userrepo.GetByIdAsync(id);
             if (user == null)
             {
                 return NotFound("No User With this Id");
@@ -44,72 +46,18 @@ namespace Online_Library.Controllers
             return Ok(user);
         }
 
-        [HttpPost("Register"), AllowAnonymous]
-
-        public IActionResult Register(UserRegisterDto user)
-        {
-
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            if (user.Password != user.RePassword)
-            {
-                return BadRequest("Password And Confirm Password Doesn't Match");
-            }
-            string userName = user.UserName;
-            string email = user.Email;
-            var existingUser = _repo.CheckForExistingUsers(user);
-
-            if (!(existingUser == null))
-            {
-                return BadRequest("Username or email already exists");
-            }
-
-
-            _repo.Register(user);
-            return CreatedAtAction(nameof(Register), new { user.Email }, user);
-        }
-
-
-        [HttpPost("Login"), AllowAnonymous]
-
-        public IActionResult Login(UserlLoginDto user)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            var session = _httpcontextacessor.HttpContext.Session;
-            var existingUser = _repo.GetUserByEmail(user);
-
-            if (existingUser == null || !_repo.VerifyPasswordHash(user.Password, existingUser.PasswordHash, existingUser.PassordSalt))
-            {
-                return NotFound("There Is no User With this credntials");
-            }
-            if (existingUser.IsAccepted is false || existingUser.IsAccepted is null)
-            {
-                return NotFound("User not Accepted yet");
-            }
-            string token = _repo.CreateToken(existingUser);
-            session.SetString("username", existingUser.UserName);
-            session.SetString("email", existingUser.Email);
-            var tokenid = new TokenID();
-            tokenid.jwt = token;
-            tokenid.id = existingUser.Id;
-            return Ok(tokenid);
-        }
+        
 
 
         [HttpPut("Modify/{id}")]
 
-        public IActionResult Modify([FromRoute] int id, [FromBody] ModifyUserDTO DTO)
+        public async Task<IActionResult> Modify([FromRoute] int id, [FromBody] ModifyUserDTO DTO)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            var existingUser = _repo.GetUserByID(DTO);
+            var existingUser = await _userrepo.GetByIdAsync(DTO.userid);
 
             if (existingUser is null)
             {
@@ -118,21 +66,29 @@ namespace Online_Library.Controllers
 
             if (id == 0)
             {
-                _repo.Accept(existingUser);
+                existingUser.IsAccepted = true;
+               _userrepo.Update(existingUser);
+               await _userrepo.SaveChangesAsync();
             }
             if (id == 1)
             {
-                _repo.Reject(existingUser);
+                existingUser.IsAccepted = false;
+                _userrepo.Update(existingUser);
+                await _userrepo.SaveChangesAsync();
             }
 
             if (id == 2)
             {
-                _repo.MakeLibrarian(existingUser);
+                existingUser.IsAdmin = true;
+                _userrepo.Update(existingUser);
+                await _userrepo.SaveChangesAsync();
             }
 
             if (id == 3)
             {
-                _repo.MakeUser(existingUser);
+                existingUser.IsAdmin = false;
+                _userrepo.Update(existingUser);
+                await _userrepo.SaveChangesAsync();
             }
 
             return Ok("Success");

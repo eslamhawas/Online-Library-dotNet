@@ -21,6 +21,6 @@ namespace Online_Library.Models
         [JsonIgnore]
         public virtual Book? BookIsbnNavigation { get; set; }
         [JsonIgnore]
-        public virtual User? User { get; set; }
+        public virtual Users? User { get; set; }
     }
 }

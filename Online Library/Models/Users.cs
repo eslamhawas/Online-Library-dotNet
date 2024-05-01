@@ -1,10 +1,11 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace Online_Library.Models
 {
-    public partial class User
+    public partial class Users
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -24,9 +25,9 @@ namespace Online_Library.Models
 
         [DefaultValue(null)]
         public bool? IsAccepted { get; set; }
+        [JsonIgnore]
         public byte[]? PasswordHash { get; set; }
+        [JsonIgnore]
         public byte[]? PassordSalt { get; set; }
-        public string encryptionkey { get; set; }
-        public string IVKey { get; set; }
     }
 }

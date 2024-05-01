@@ -1,7 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Online_Library.Data;
 using Online_Library.DTOS;
-using Online_Library.Interfaces;
+using Online_Library.Models;
 
 namespace Online_Library.Controllers
 {
@@ -10,41 +13,123 @@ namespace Online_Library.Controllers
     [Authorize(Roles = "Admin")]
     public class BorrowedBooksController : ControllerBase
     {
-        private readonly IBorrowedBooksRepository _borrowedBooksRepository;
+        private readonly IDataRepository<BorrowedBook> _repo;
+        private readonly IDataRepository<Users> _userrepo;
+        private readonly IDataRepository<Book> _bookrepo;
+        private readonly IMapper _mapper;
+        private static Random random = new Random();
 
-        public BorrowedBooksController(IBorrowedBooksRepository borrowedBooksRepository)
+        public BorrowedBooksController( IDataRepository<BorrowedBook> repo,
+            IMapper mapper,
+            IDataRepository<Users> userrepo,
+            IDataRepository<Book> bookrepo)
         {
-            _borrowedBooksRepository = borrowedBooksRepository;
+            
+            _repo = repo;
+            _mapper = mapper;
+            _userrepo = userrepo;
+            _bookrepo = bookrepo;
         }
 
         [HttpGet]
 
-        public IActionResult GetBorrowedBooks()
+        public async Task<IActionResult> GetBorrowedBooks()
         {
-            var books = _borrowedBooksRepository.GetBorrowedBooks();
-            return Ok(books);
+            var returnedBooks = await _repo.GetQueryable()
+            .Join(
+            _bookrepo.GetQueryable(), // No lambda needed here (automatic include)
+                borrowedBook => borrowedBook.BookIsbn,
+                book => book.Isbn,
+                (borrowedBook, book) => new BorrowedBookDto
+                {
+                    DateOfReturn = borrowedBook.DateOfReturn,
+                    OrderNumber = (int)borrowedBook.OrderNumber,
+                    IsAccepted = borrowedBook.IsAccepted,
+                    BookIsbn = borrowedBook.BookIsbn,
+                    UserId = borrowedBook.UserId,
+                    BookTitle = book.Title,
+                    Price = book.Price,
+                    UserName = null
+                }
+            )
+            .Join(
+                _userrepo.GetQueryable(),
+                borrowedBookDto => borrowedBookDto.UserId,
+                user => user.Id,
+                (borrowedBookDto, user) =>
+                  new BorrowedBookDto
+                  {
+                      DateOfReturn = borrowedBookDto.DateOfReturn,
+                      OrderNumber = borrowedBookDto.OrderNumber,
+                      IsAccepted = borrowedBookDto.IsAccepted,
+                      BookIsbn = borrowedBookDto.BookIsbn,
+                      UserId = borrowedBookDto.UserId,
+                      BookTitle = borrowedBookDto.BookTitle,
+                      Price = borrowedBookDto.Price,
+                      UserName = user.UserName
+                  }
+              )
+              .ToListAsync();
+
+            return Ok(returnedBooks);
         }
 
 
 
         [HttpGet("{id}"), AllowAnonymous]
 
-        public IActionResult GetBorrowedBookByID(int id)
+        public async Task<IActionResult> GetBorrowedBookByID(int id)
         {
-            var books = _borrowedBooksRepository.GetBorrowedBooksById(id);
+            var returnedBooks = await _repo.GetQueryable().Where(u => u.UserId == id)
+      .Join(
+        _bookrepo.GetQueryable(), // No lambda needed here (automatic include)
+        borrowedBook => borrowedBook.BookIsbn,
+        book => book.Isbn,
+        (borrowedBook, book) => new BorrowedBookDto
+        {
+            DateOfReturn = borrowedBook.DateOfReturn,
+            OrderNumber = (int)borrowedBook.OrderNumber,
+            IsAccepted = borrowedBook.IsAccepted,
+            BookIsbn = borrowedBook.BookIsbn,
+            UserId = borrowedBook.UserId,
+            BookTitle = book.Title,
+            Price = book.Price,
+            UserName = null // Assuming you'll populate this later
+        }
+      )
+      .Join(
+        _userrepo.GetQueryable(),
+        borrowedBookDto => borrowedBookDto.UserId,
+        user => user.Id,
+        (borrowedBookDto, user) =>  // Simplified lambda
+          new BorrowedBookDto // Create a new instance
+          {
+              DateOfReturn = borrowedBookDto.DateOfReturn,
+              OrderNumber = borrowedBookDto.OrderNumber,
+              IsAccepted = borrowedBookDto.IsAccepted,
+              BookIsbn = borrowedBookDto.BookIsbn,
+              UserId = borrowedBookDto.UserId,
+              BookTitle = borrowedBookDto.BookTitle,
+              Price = borrowedBookDto.Price,
+              UserName = user.UserName
+          }
+      )
+      .ToListAsync();
 
-            if (books == null)
+            
+
+            if (returnedBooks == null)
             {
                 return NotFound("There is no record for this user");
             }
 
-            return Ok(books);
+            return Ok(returnedBooks);
         }
 
 
 
         [HttpPost(), AllowAnonymous]
-        public IActionResult AddBorrowedBook(AddBorrowedBookDto borrowedBook)
+        public async Task<IActionResult> AddBorrowedBook(AddBorrowedBookDto borrowedBook)
         {
 
             if (borrowedBook == null)
@@ -57,7 +142,14 @@ namespace Online_Library.Controllers
             }
 
 
-            _borrowedBooksRepository.AddBorrowedBook(borrowedBook);
+            var Book = _mapper.Map<BorrowedBook>(borrowedBook);
+
+            Book.IsAccepted = null;
+            Book.DateOfReturn = null;
+            Book.OrderNumber = GetRandomNumber(10, 100000);
+
+            _repo.Insert(Book);
+            await _repo.SaveChangesAsync();
 
             return Ok();
 
@@ -66,11 +158,24 @@ namespace Online_Library.Controllers
         }
 
         [HttpGet("report")]
-        public IActionResult GetBorrowedBooksReport()
+        public async Task<IActionResult> GetBorrowedBooksReport()
         {
-            var BorrowedBooks = _borrowedBooksRepository.GetBorrowedBooksReport();
 
-            return Ok(BorrowedBooks);
+            int TotalBorrowedBooks = await _repo.GetQueryable().Where(x => x.IsAccepted == true && x.IsAccepted != null).CountAsync();
+
+            int TotalUsers =await _repo.GetQueryable().Where(x => x.IsAccepted == true && x.IsAccepted != null)
+                .Select(x => x.UserId).Distinct().CountAsync();
+
+            string MostBorrowedBook = await _repo.GetQueryable().Where(x => x.IsAccepted == true && x.IsAccepted != null)
+                .GroupBy(x => x.BookIsbn).OrderByDescending(b => b.Count()).Select(b => b.FirstOrDefault()
+                .BookIsbnNavigation.Title).FirstOrDefaultAsync();
+
+            string leastBorrowedBooks = await _repo.GetQueryable().Where(x => x.IsAccepted == true && x.IsAccepted != null)
+                .GroupBy(x => x.BookIsbn).OrderBy(b => b.Count()).Select(b => b.FirstOrDefault().BookIsbnNavigation.Title).FirstOrDefaultAsync();
+
+            return Ok("Total Borrowed Books is :" + TotalBorrowedBooks + "\n Total Users number is :" + TotalUsers +
+                "\n The Most Borrowed Book is :" + MostBorrowedBook + "\n The Least Borrowed Book is :" + leastBorrowedBooks);
+
         }
 
 
@@ -78,35 +183,52 @@ namespace Online_Library.Controllers
 
         [HttpDelete("{ordernumber}")]
 
-        public IActionResult DeleteBorrowedBook(int ordernumber)
+        public async Task<IActionResult> DeleteBorrowedBook(int ordernumber)
         {
-            var book = _borrowedBooksRepository.GetBorrowedBookByOrderNum(ordernumber);
+            var book = await _repo.GetByIdAsync(ordernumber);
             if (book == null)
             {
                 return NotFound("Borrowed book with order number " + ordernumber + " not found.");
             }
-            _borrowedBooksRepository.RemoveBorrowedBook(book);
+            _repo.Delete(book);
+            await _repo.SaveChangesAsync();
             return Ok("Order number: " + ordernumber + " has been deleted successfully");
 
         }
 
 
         [HttpPut("update")]
-        public IActionResult UpdateBorrowedBooks(BorrowedBookUpdateDto borrowedBookUpdateDto)
+        public async Task<IActionResult> UpdateBorrowedBooks(BorrowedBookUpdateDto borrowedBookUpdateDto)
         {
-            if (!ModelState.IsValid)
+            var borrowedBook = await _repo.GetByIdAsync(borrowedBookUpdateDto.OrderNumber);
+            if(borrowedBook == null)
             {
-                return BadRequest(ModelState);
+                return BadRequest("There is no record with this order number");
             }
 
-            var result = _borrowedBooksRepository.UpdateBorrowedBooks(borrowedBookUpdateDto);
+            borrowedBook.IsAccepted = borrowedBookUpdateDto.IsAccepted;
 
-            return Ok(result);
+            if (borrowedBookUpdateDto.IsAccepted)
+            {
+                borrowedBook.DateOfReturn = borrowedBookUpdateDto.DateOfReturn;
+                var book = await _bookrepo.GetByIdAsync(borrowedBook.BookIsbn);
+                book.StockNumber -= 1;
+                _bookrepo.Update(book);
+                await _repo.SaveChangesAsync();
+            }
+
+            _repo.Update(borrowedBook);
+            await _repo.SaveChangesAsync();
+
+            return Ok("updated successfully");
 
         }
 
 
-
+        private int GetRandomNumber(int min, int max)
+        {
+            return random.Next(min, max); // Generates a random number between min (inclusive) and max (exclusive)
+        }
 
     }
 }

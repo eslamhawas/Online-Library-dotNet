@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Online_Library.Interfaces;
+using Online_Library.Data;
 using Online_Library.Models;
 
 namespace Online_Library.Controllers
@@ -10,17 +10,17 @@ namespace Online_Library.Controllers
     [Authorize(Roles = "Admin")]
     public class BookController : ControllerBase
     {
-        private readonly IBooksRepository _booksRepository;
+        private readonly IDataRepository<Book> _repo;
 
-        public BookController(IBooksRepository booksRepository)
+        public BookController( IDataRepository<Book> repo)
         {
-            _booksRepository = booksRepository;
+            _repo = repo;
         }
 
         [HttpGet("Book"), AllowAnonymous]
-        public IActionResult GetAllBooks()
+        public async  Task<IActionResult> GetAllBooks()
         {
-            var books = _booksRepository.GetAllBooks();
+            var books = await _repo.GetAllAsync();
             if (books is null)
             {
                 return NotFound("There is no books in DB");
@@ -30,13 +30,13 @@ namespace Online_Library.Controllers
         }
 
         [HttpPut("Book")]
-        public IActionResult UpdateBook(Book updatedBook)
+        public async Task<IActionResult> UpdateBook(Book updatedBook)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            var existingBook = _booksRepository.GetByIsbn(updatedBook.Isbn);
+            var existingBook = await _repo.GetByIdAsync(updatedBook.Isbn);
 
             if (existingBook == null)
             {
@@ -50,43 +50,46 @@ namespace Online_Library.Controllers
             existingBook.Price = updatedBook.Price;
             existingBook.StockNumber = updatedBook.StockNumber;
 
-            _booksRepository.UpdateBook(existingBook);
+            _repo.Update(existingBook);
+            await _repo.SaveChangesAsync();
 
             return Ok();
         }
 
 
         [HttpDelete("Book/{Isbn}")]
-        public IActionResult DeleteBook(string Isbn)
+        public async Task<IActionResult> DeleteBook(string Isbn)
         {
-            var book = _booksRepository.GetByIsbn(Isbn);
+            var book = await _repo.GetByIdAsync(Isbn);
             if (book == null)
             {
                 return NotFound("No Book With this ISBN");
             }
 
-            _booksRepository.DeleteBook(book);
+            _repo.Delete(book);
+            await _repo.SaveChangesAsync();
             return NoContent();
         }
 
         [HttpPost("Books")]
-        public IActionResult AddBook(Book book)
+        public async Task<IActionResult> AddBook(Book book)
         {
             if(!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            var isbn = _booksRepository.AddBook(book);
-            return CreatedAtAction(nameof(GetBookbyISBN), new { isbn }, null);
+            _repo.Insert(book);
+            await _repo.SaveChangesAsync();
+            return CreatedAtAction(nameof(GetBookbyISBN), new { book.Isbn }, null);
         }
 
 
 
         [HttpGet("{isbn}"), AllowAnonymous]
-        public IActionResult GetBookbyISBN(string isbn)
+        public async Task<IActionResult> GetBookbyISBN(string isbn)
         {
 
-            var book = _booksRepository.GetByIsbn(isbn);
+            var book = await _repo.GetByIdAsync(isbn);
             if (book == null)
             {
                 return NotFound("The book with this ISBN: " + isbn + " Not Found");

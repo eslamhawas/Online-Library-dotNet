@@ -3,8 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Online_Library.Data;
-using Online_Library.Interfaces;
-using Online_Library.Repositories;
+
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
 
@@ -29,9 +28,8 @@ builder.Services.AddSwaggerGen(options =>
     options.OperationFilter<SecurityRequirementsOperationFilter>();
 });
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IBorrowedBooksRepository, BorrowedBooksRepository>();
-builder.Services.AddScoped<IBooksRepository, BookRepository>();
+builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+builder.Services.AddScoped(typeof(IDataRepository<>),typeof(DataRepository<>));
 builder.Services.AddDbContext<OnlineLibraryContext>(options => options.UseSqlServer(
     builder.Configuration.GetConnectionString("DefaultConnection")
     ));

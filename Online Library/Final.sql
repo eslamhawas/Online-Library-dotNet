@@ -22,7 +22,7 @@ IVKey nvarchar(50))
  
  CREATE TABLE dbo.BorrowedBooks(
  DateOfReturn DATE ,
- OrderNumber int,
+ OrderNumber int PRIMARY KEY,
  IsAccepted BIT,
  BookISBN varchar(50),
  UserID INT,

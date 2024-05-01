@@ -16,7 +16,7 @@ namespace Online_Library.Data
 
         public virtual DbSet<Book> Books { get; set; } = null!;
         public virtual DbSet<BorrowedBook> BorrowedBooks { get; set; } = null!;
-        public virtual DbSet<User> Users { get; set; } = null!;
+        public virtual DbSet<Users> Users { get; set; } = null!;
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -46,7 +46,8 @@ namespace Online_Library.Data
 
             modelBuilder.Entity<BorrowedBook>(entity =>
             {
-
+                entity.HasKey(e => e.OrderNumber)
+                    .HasName("PK__Borrowed__CAC5E742E2444D8A");
 
                 entity.Property(e => e.BookIsbn)
                     .HasMaxLength(50)
@@ -60,15 +61,15 @@ namespace Online_Library.Data
                 entity.HasOne(d => d.BookIsbnNavigation)
                     .WithMany()
                     .HasForeignKey(d => d.BookIsbn)
-                    .HasConstraintName("FK__BorrowedB__BookI__45F365D3");
+                    .HasConstraintName("FK__BorrowedB__BookI__49C3F6B7");
 
                 entity.HasOne(d => d.User)
                     .WithMany()
                     .HasForeignKey(d => d.UserId)
-                    .HasConstraintName("FK__BorrowedB__UserI__46E78A0C");
+                    .HasConstraintName("FK__BorrowedB__UserI__4AB81AF0");
             });
 
-            modelBuilder.Entity<User>(entity =>
+            modelBuilder.Entity<Users>(entity =>
             {
                 entity.Property(e => e.Id).HasColumnName("ID");
 
@@ -84,12 +85,6 @@ namespace Online_Library.Data
 
                 entity.Property(e => e.UserName)
                     .HasMaxLength(50)
-                    .IsUnicode(false);
-                entity.Property(e => e.encryptionkey)
-                    .HasMaxLength(100)
-                    .IsUnicode(false);
-                entity.Property(e => e.IVKey)
-                    .HasMaxLength(100)
                     .IsUnicode(false);
             });
 
