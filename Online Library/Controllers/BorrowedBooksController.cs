@@ -13,7 +13,7 @@ namespace Online_Library.Controllers
     [Authorize(Roles = "Admin")]
     public class BorrowedBooksController : ControllerBase
     {
-        private readonly IDataRepository<BorrowedBook> _repo;
+        private readonly IDataRepository<BorrowedBook> _borrowedbooksrepo;
         private readonly IDataRepository<Users> _userrepo;
         private readonly IDataRepository<Book> _bookrepo;
         private readonly IMapper _mapper;
@@ -25,7 +25,7 @@ namespace Online_Library.Controllers
             IDataRepository<Book> bookrepo)
         {
             
-            _repo = repo;
+            _borrowedbooksrepo = repo;
             _mapper = mapper;
             _userrepo = userrepo;
             _bookrepo = bookrepo;
@@ -35,7 +35,7 @@ namespace Online_Library.Controllers
 
         public async Task<IActionResult> GetBorrowedBooks()
         {
-            var returnedBooks = await _repo.GetQueryable()
+            var returnedBooks = await _borrowedbooksrepo.GetQueryable()
             .Join(
             _bookrepo.GetQueryable(), // No lambda needed here (automatic include)
                 borrowedBook => borrowedBook.BookIsbn,
@@ -80,7 +80,7 @@ namespace Online_Library.Controllers
 
         public async Task<IActionResult> GetBorrowedBookByID(int id)
         {
-            var returnedBooks = await _repo.GetQueryable().Where(u => u.UserId == id)
+            var returnedBooks = await _borrowedbooksrepo.GetQueryable().Where(u => u.UserId == id)
       .Join(
         _bookrepo.GetQueryable(), // No lambda needed here (automatic include)
         borrowedBook => borrowedBook.BookIsbn,
@@ -148,8 +148,8 @@ namespace Online_Library.Controllers
             Book.DateOfReturn = null;
             Book.OrderNumber = GetRandomNumber(10, 100000);
 
-            _repo.Insert(Book);
-            await _repo.SaveChangesAsync();
+            _borrowedbooksrepo.Insert(Book);
+            await _borrowedbooksrepo.SaveChangesAsync();
 
             return Ok();
 
@@ -161,16 +161,16 @@ namespace Online_Library.Controllers
         public async Task<IActionResult> GetBorrowedBooksReport()
         {
 
-            int TotalBorrowedBooks = await _repo.GetQueryable().Where(x => x.IsAccepted == true && x.IsAccepted != null).CountAsync();
+            int TotalBorrowedBooks = await _borrowedbooksrepo.GetQueryable().Where(x => x.IsAccepted == true && x.IsAccepted != null).CountAsync();
 
-            int TotalUsers =await _repo.GetQueryable().Where(x => x.IsAccepted == true && x.IsAccepted != null)
+            int TotalUsers =await _borrowedbooksrepo.GetQueryable().Where(x => x.IsAccepted == true && x.IsAccepted != null)
                 .Select(x => x.UserId).Distinct().CountAsync();
 
-            string MostBorrowedBook = await _repo.GetQueryable().Where(x => x.IsAccepted == true && x.IsAccepted != null)
+            string MostBorrowedBook = await _borrowedbooksrepo.GetQueryable().Where(x => x.IsAccepted == true && x.IsAccepted != null)
                 .GroupBy(x => x.BookIsbn).OrderByDescending(b => b.Count()).Select(b => b.FirstOrDefault()
                 .BookIsbnNavigation.Title).FirstOrDefaultAsync();
 
-            string leastBorrowedBooks = await _repo.GetQueryable().Where(x => x.IsAccepted == true && x.IsAccepted != null)
+            string leastBorrowedBooks = await _borrowedbooksrepo.GetQueryable().Where(x => x.IsAccepted == true && x.IsAccepted != null)
                 .GroupBy(x => x.BookIsbn).OrderBy(b => b.Count()).Select(b => b.FirstOrDefault().BookIsbnNavigation.Title).FirstOrDefaultAsync();
 
             return Ok("Total Borrowed Books is :" + TotalBorrowedBooks + "\n Total Users number is :" + TotalUsers +
@@ -185,13 +185,13 @@ namespace Online_Library.Controllers
 
         public async Task<IActionResult> DeleteBorrowedBook(int ordernumber)
         {
-            var book = await _repo.GetByIdAsync(ordernumber);
+            var book = await _borrowedbooksrepo.GetByIdAsync(ordernumber);
             if (book == null)
             {
                 return NotFound("Borrowed book with order number " + ordernumber + " not found.");
             }
-            _repo.Delete(book);
-            await _repo.SaveChangesAsync();
+            _borrowedbooksrepo.Delete(book);
+            await _borrowedbooksrepo.SaveChangesAsync();
             return Ok("Order number: " + ordernumber + " has been deleted successfully");
 
         }
@@ -200,7 +200,7 @@ namespace Online_Library.Controllers
         [HttpPut("update")]
         public async Task<IActionResult> UpdateBorrowedBooks(BorrowedBookUpdateDto borrowedBookUpdateDto)
         {
-            var borrowedBook = await _repo.GetByIdAsync(borrowedBookUpdateDto.OrderNumber);
+            var borrowedBook = await _borrowedbooksrepo.GetByIdAsync(borrowedBookUpdateDto.OrderNumber);
             if(borrowedBook == null)
             {
                 return BadRequest("There is no record with this order number");
@@ -214,11 +214,11 @@ namespace Online_Library.Controllers
                 var book = await _bookrepo.GetByIdAsync(borrowedBook.BookIsbn);
                 book.StockNumber -= 1;
                 _bookrepo.Update(book);
-                await _repo.SaveChangesAsync();
+                await _borrowedbooksrepo.SaveChangesAsync();
             }
 
-            _repo.Update(borrowedBook);
-            await _repo.SaveChangesAsync();
+            _borrowedbooksrepo.Update(borrowedBook);
+            await _borrowedbooksrepo.SaveChangesAsync();
 
             return Ok("updated successfully");
 
