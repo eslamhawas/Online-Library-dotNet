@@ -8,6 +8,7 @@ namespace Online_Library.Controllers
 {
     [Route("api/v1/")]
     [ApiController]
+    [AllowAnonymous]
     public class AuthController : ControllerBase
     {
         private readonly IAuthRepository _authRepository;
