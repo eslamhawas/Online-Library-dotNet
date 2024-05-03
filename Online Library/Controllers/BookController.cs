@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Online_Library.Data;
 using Online_Library.Models;
 
@@ -98,6 +99,37 @@ namespace Online_Library.Controllers
             return Ok(book);
 
 
+        }
+
+
+
+        [HttpGet("report")]
+        public async Task<IActionResult> GetBooksReport()
+        {
+           
+            
+                var totalBooksInStock = _repo.GetQueryable().Sum(b => b.StockNumber);
+
+                var mostStockedBook =  _repo.GetQueryable()
+                    .OrderByDescending(b => b.StockNumber)
+                    .FirstOrDefault();
+
+            string report;
+
+                if (mostStockedBook != null)
+                {
+                    report= $"Total Books in Stock: {totalBooksInStock}," +
+                        $"\n Most Stocked Book: {mostStockedBook.Title}," +
+                        $"\n Category: {mostStockedBook.Category}," +
+                        $"\n Stock Number: {mostStockedBook.StockNumber}";
+                }
+                else
+                {
+                    report= "No books found.";
+                }
+            
+
+            return Ok(report);
         }
     }
 }
