@@ -21,7 +21,7 @@ namespace Online_Library.Controllers
 
 
 
-        [HttpPost("Register"), AllowAnonymous]
+        [HttpPost("Register")]
 
         public IActionResult Register(UserRegisterDto user)
         {
@@ -49,7 +49,7 @@ namespace Online_Library.Controllers
         }
 
 
-        [HttpPost("Login"), AllowAnonymous]
+        [HttpPost("Login")]
 
         public IActionResult Login(UserlLoginDto user)
         {
