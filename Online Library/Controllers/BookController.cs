@@ -108,7 +108,7 @@ namespace Online_Library.Controllers
         {
            
             
-                var totalBooksInStock = _repo.GetQueryable().Sum(b => b.StockNumber);
+                var totalBooksInStock = await _repo.GetQueryable().SumAsync(b => b.StockNumber);
 
                 var mostStockedBook =  _repo.GetQueryable()
                     .OrderByDescending(b => b.StockNumber)
