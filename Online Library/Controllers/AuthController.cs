@@ -51,7 +51,7 @@ namespace Online_Library.Controllers
 
         [HttpPost("Login")]
 
-        public IActionResult Login(UserlLoginDto user)
+        public IActionResult Login(UserLoginDto user)
         {
             if (!ModelState.IsValid)
             {

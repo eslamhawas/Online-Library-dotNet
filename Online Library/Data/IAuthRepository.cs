@@ -10,7 +10,7 @@ namespace Online_Library.Data
         bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt);
         string CreateToken(Users user);
         Users CheckForExistingUsers(UserRegisterDto user);
-        public Users GetUserByEmail(UserlLoginDto user);
+        public Users GetUserByEmail(UserLoginDto user);
         
     }
 }

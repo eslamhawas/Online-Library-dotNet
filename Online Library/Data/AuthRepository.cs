@@ -102,7 +102,7 @@ namespace Online_Library.Data
             return existingUser;
         }
 
-        public Users GetUserByEmail(UserlLoginDto user)
+        public Users GetUserByEmail(UserLoginDto user)
         {
             string email = user.Email;
             var existingUser = _context.Users.Where(u => u.Email == email).FirstOrDefault();

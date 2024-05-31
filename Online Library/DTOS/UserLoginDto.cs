@@ -2,7 +2,7 @@
 
 namespace Online_Library.DTOS
 {
-    public class UserlLoginDto
+    public class UserLoginDto
     {
         [Required]
         [EmailAddress]
