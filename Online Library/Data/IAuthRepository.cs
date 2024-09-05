@@ -1,4 +1,5 @@
-﻿using Online_Library.DTOS;
+﻿using Microsoft.EntityFrameworkCore;
+using Online_Library.DTOS;
 using Online_Library.Models;
 
 namespace Online_Library.Data
@@ -10,6 +11,6 @@ namespace Online_Library.Data
         string CreateToken(Users user);
         Users CheckForExistingUsers(UserRegisterDto user);
         public Users GetUserByEmail(UserLoginDto user);
-
+        
     }
 }

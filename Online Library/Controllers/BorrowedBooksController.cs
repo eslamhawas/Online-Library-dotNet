@@ -19,12 +19,12 @@ namespace Online_Library.Controllers
         private readonly IMapper _mapper;
         private static Random random = new Random();
 
-        public BorrowedBooksController(IDataRepository<BorrowedBook> repo,
+        public BorrowedBooksController( IDataRepository<BorrowedBook> repo,
             IMapper mapper,
             IDataRepository<Users> userrepo,
             IDataRepository<Book> bookrepo)
         {
-
+            
             _borrowedbooksrepo = repo;
             _mapper = mapper;
             _userrepo = userrepo;
@@ -116,7 +116,7 @@ namespace Online_Library.Controllers
       )
       .ToListAsync();
 
-
+            
 
             if (returnedBooks == null)
             {
@@ -163,7 +163,7 @@ namespace Online_Library.Controllers
 
             int TotalBorrowedBooks = await _borrowedbooksrepo.GetQueryable().Where(x => x.IsAccepted == true && x.IsAccepted != null).CountAsync();
 
-            int TotalUsers = await _borrowedbooksrepo.GetQueryable().Where(x => x.IsAccepted == true && x.IsAccepted != null)
+            int TotalUsers =await _borrowedbooksrepo.GetQueryable().Where(x => x.IsAccepted == true && x.IsAccepted != null)
                 .Select(x => x.UserId).Distinct().CountAsync();
 
             string MostBorrowedBook = await _borrowedbooksrepo.GetQueryable().Where(x => x.IsAccepted == true && x.IsAccepted != null)
@@ -201,7 +201,7 @@ namespace Online_Library.Controllers
         public async Task<IActionResult> UpdateBorrowedBooks(BorrowedBookUpdateDto borrowedBookUpdateDto)
         {
             var borrowedBook = await _borrowedbooksrepo.GetByIdAsync(borrowedBookUpdateDto.OrderNumber);
-            if (borrowedBook == null)
+            if(borrowedBook == null)
             {
                 return BadRequest("There is no record with this order number");
             }

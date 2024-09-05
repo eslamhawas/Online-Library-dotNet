@@ -65,7 +65,7 @@ namespace Online_Library.Controllers
             }
             if (existingUser.IsAccepted is false || existingUser.IsAccepted is null)
             {
-                return NotFound("User not Accepted yet");
+                return BadRequest("User not Accepted yet");
             }
             string token = _authRepository.CreateToken(existingUser);
             var tokenid = new TokenID();

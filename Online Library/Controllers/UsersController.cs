@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Online_Library.Data;
 using Online_Library.DTOS;
 using Online_Library.Models;
@@ -45,7 +46,7 @@ namespace Online_Library.Controllers
             return Ok(user);
         }
 
-
+        
 
 
         [HttpPut("Modify/{id}")]
@@ -66,8 +67,8 @@ namespace Online_Library.Controllers
             if (id == 0)
             {
                 existingUser.IsAccepted = true;
-                _userrepo.Update(existingUser);
-                await _userrepo.SaveChangesAsync();
+               _userrepo.Update(existingUser);
+               await _userrepo.SaveChangesAsync();
             }
             if (id == 1)
             {

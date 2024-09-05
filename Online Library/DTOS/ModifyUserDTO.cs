@@ -5,7 +5,7 @@ namespace Online_Library.DTOS
     public class ModifyUserDTO
     {
         [Required]
-        public int userid { get; set; }
+        public int userid { get; set; } 
 
     }
 }
