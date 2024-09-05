@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Online_Library.Data;
 using Online_Library.DTOS;
 using Online_Library.Models;
@@ -12,7 +11,7 @@ namespace Online_Library.Controllers
     /*Authorize attribute can also be usen on controller
     to allow any access you can use AllowAnonymous*/
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "SuperAdmin")]
     public class UsersController : ControllerBase
     {
         private readonly IDataRepository<Users> _userrepo;
@@ -46,7 +45,7 @@ namespace Online_Library.Controllers
             return Ok(user);
         }
 
-        
+
 
 
         [HttpPut("Modify/{id}")]
@@ -67,8 +66,8 @@ namespace Online_Library.Controllers
             if (id == 0)
             {
                 existingUser.IsAccepted = true;
-               _userrepo.Update(existingUser);
-               await _userrepo.SaveChangesAsync();
+                _userrepo.Update(existingUser);
+                await _userrepo.SaveChangesAsync();
             }
             if (id == 1)
             {

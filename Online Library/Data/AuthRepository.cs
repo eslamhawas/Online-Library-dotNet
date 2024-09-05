@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Online_Library.DTOS;
 using Online_Library.Models;
@@ -32,6 +31,10 @@ namespace Online_Library.Data
             {
                 Role = "User";
             }
+            if (user.IsSuperAdmin is true)
+            {
+                Role = "SuperAdmin";
+            }
             List<Claim> claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, user.UserName),
@@ -53,7 +56,7 @@ namespace Online_Library.Data
             return jwt;
         }
 
-        public  void Register(UserRegisterDto userDto)
+        public void Register(UserRegisterDto userDto)
         {
             var user = _mapper.Map<Users>(userDto);
             user.IsAccepted = null;
@@ -62,12 +65,12 @@ namespace Online_Library.Data
             user.PasswordHash = passwordHash;
             user.PassordSalt = passwordSalt;
             // auto accept new user and make them admin if there is no users in DB
-            bool anyUsers = _context.Users.Any();
-            if (!anyUsers)
-            {
-                user.IsAccepted = true;
-                user.IsAdmin = true;
-            }
+            //bool anyUsers = _context.Users.Any();
+            //if (!anyUsers)
+            //{
+            user.IsAccepted = true;
+            user.IsAdmin = true;
+            //}
 
             _context.Users.Add(user);
             _context.SaveChanges();
@@ -77,7 +80,7 @@ namespace Online_Library.Data
         {
             using (var hmac = new HMACSHA512(passwordSalt))
             {
-                var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+                var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
                 return computedHash.SequenceEqual(passwordHash);
             }
         }
@@ -89,7 +92,7 @@ namespace Online_Library.Data
             using (var hmac = new HMACSHA512())
             {
                 passwordSalt = hmac.Key;
-                passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+                passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
             }
         }
 

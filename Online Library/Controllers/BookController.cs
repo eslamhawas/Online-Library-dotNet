@@ -13,13 +13,13 @@ namespace Online_Library.Controllers
     {
         private readonly IDataRepository<Book> _repo;
 
-        public BookController( IDataRepository<Book> repo)
+        public BookController(IDataRepository<Book> repo)
         {
             _repo = repo;
         }
 
         [HttpGet("Book"), AllowAnonymous]
-        public async  Task<IActionResult> GetAllBooks()
+        public async Task<IActionResult> GetAllBooks()
         {
             var books = await _repo.GetAllAsync();
             if (books is null)
@@ -75,7 +75,7 @@ namespace Online_Library.Controllers
         [HttpPost("Books")]
         public async Task<IActionResult> AddBook(Book book)
         {
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
@@ -106,28 +106,28 @@ namespace Online_Library.Controllers
         [HttpGet("report")]
         public async Task<IActionResult> GetBooksReport()
         {
-           
-            
-                var totalBooksInStock = await _repo.GetQueryable().SumAsync(b => b.StockNumber);
 
-                var mostStockedBook =  _repo.GetQueryable()
-                    .OrderByDescending(b => b.StockNumber)
-                    .FirstOrDefault();
+
+            var totalBooksInStock = await _repo.GetQueryable().SumAsync(b => b.StockNumber);
+
+            var mostStockedBook = _repo.GetQueryable()
+                .OrderByDescending(b => b.StockNumber)
+                .FirstOrDefault();
 
             string report;
 
-                if (mostStockedBook != null)
-                {
-                    report= $"Total Books in Stock: {totalBooksInStock}," +
-                        $"\n Most Stocked Book: {mostStockedBook.Title}," +
-                        $"\n Category: {mostStockedBook.Category}," +
-                        $"\n Stock Number: {mostStockedBook.StockNumber}";
-                }
-                else
-                {
-                    report= "No books found.";
-                }
-            
+            if (mostStockedBook != null)
+            {
+                report = $"Total Books in Stock: {totalBooksInStock}," +
+                    $"\n Most Stocked Book: {mostStockedBook.Title}," +
+                    $"\n Category: {mostStockedBook.Category}," +
+                    $"\n Stock Number: {mostStockedBook.StockNumber}";
+            }
+            else
+            {
+                report = "No books found.";
+            }
+
 
             return Ok(report);
         }

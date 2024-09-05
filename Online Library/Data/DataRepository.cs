@@ -31,7 +31,7 @@ namespace Online_Library.Data
 
         public void Insert(T entity)
         {
-           table.AddAsync(entity);
+            table.AddAsync(entity);
         }
 
 
@@ -45,7 +45,7 @@ namespace Online_Library.Data
             table.Remove(entity);
         }
 
-        public  Task SaveChangesAsync()
+        public Task SaveChangesAsync()
         {
             return _context.SaveChangesAsync();
         }

@@ -23,6 +23,10 @@ namespace Online_Library.Models
         [DefaultValue(false)]
         public bool? IsAdmin { get; set; }
 
+        [DefaultValue(false)]
+        [JsonIgnore]
+        public bool? IsSuperAdmin { get; set; }
+
         [DefaultValue(null)]
         public bool? IsAccepted { get; set; }
         [JsonIgnore]

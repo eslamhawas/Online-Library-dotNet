@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Online_Library.Data;
 using Online_Library.DTOS;
@@ -13,7 +12,7 @@ namespace Online_Library.Controllers
     {
         private readonly IAuthRepository _authRepository;
         private readonly IHttpContextAccessor _httpcontextacessor;
-        public AuthController(IAuthRepository authRepository,[FromServices] IHttpContextAccessor httpcontextacessor)
+        public AuthController(IAuthRepository authRepository, [FromServices] IHttpContextAccessor httpcontextacessor)
         {
             _authRepository = authRepository;
             _httpcontextacessor = httpcontextacessor;
@@ -57,7 +56,7 @@ namespace Online_Library.Controllers
             {
                 return BadRequest(ModelState);
             }
-            var session = _httpcontextacessor.HttpContext.Session;
+
             var existingUser = _authRepository.GetUserByEmail(user);
 
             if (existingUser == null || !_authRepository.VerifyPasswordHash(user.Password, existingUser.PasswordHash, existingUser.PassordSalt))
@@ -69,11 +68,9 @@ namespace Online_Library.Controllers
                 return NotFound("User not Accepted yet");
             }
             string token = _authRepository.CreateToken(existingUser);
-            session.SetString("username", existingUser.UserName);
-            session.SetString("email", existingUser.Email);
             var tokenid = new TokenID();
             tokenid.jwt = token;
-            tokenid.id = existingUser.Id;
+            tokenid.user = existingUser;
             return Ok(tokenid);
         }
     }
