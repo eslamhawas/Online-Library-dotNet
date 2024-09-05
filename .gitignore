@@ -361,3 +361,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/Online Library/Online Library.csproj
+/Online Library/appsettings.json
+/Online Library/Properties/PublishProfiles/site8209-WebDeploy.pubxml

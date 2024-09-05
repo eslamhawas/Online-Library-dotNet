@@ -11,11 +11,9 @@ namespace Online_Library.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthRepository _authRepository;
-        private readonly IHttpContextAccessor _httpcontextacessor;
         public AuthController(IAuthRepository authRepository, [FromServices] IHttpContextAccessor httpcontextacessor)
         {
             _authRepository = authRepository;
-            _httpcontextacessor = httpcontextacessor;
         }
 
 
